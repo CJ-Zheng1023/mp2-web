@@ -1,0 +1,61 @@
+html, body{
+  height: 100%;
+}
+body{
+  background-image: url("../images/bg.jpg");
+  background-attachment: fixed;
+  background-size: cover;
+}
+.page.page-login{
+  position: relative;
+  min-height: 450px;
+
+}
+.page.page-register{
+  position: relative;
+  min-height: 500px;
+}
+.page{
+  height: 100%;
+}
+.page.page-search{
+  min-width: 1200px;
+}
+.page-search .main{
+  max-width: 1200px;
+  margin: 30px auto;
+}
+.form-wrapper{
+  width: 360px;
+  background-color: rgba(233, 233, 233, .5);
+  box-shadow: 0 2px 12px 0 rgba(0,0,0, 0);
+  box-sizing: border-box;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 7px;
+  padding: 20px 30px 15px 30px;
+}
+.form-wrapper h3{
+  font-size: 20px;
+  text-align: center;
+}
+.form-item .input-icon input{
+  padding-left: 33px;
+}
+.form-item i{
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ccc;
+  z-index: 1;
+}
+.is-error.form-item i{
+  color: rgb(245, 108, 108);
+}
+.btn-submit{
+  float: right;
+  width: 100%;
+}
