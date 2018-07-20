@@ -12,7 +12,7 @@
               </div>
             </div>
             <div style="padding: 14px;">
-              <router-link to="/">
+              <router-link to="/address">
                 <el-button type="text" class="button">地址标引</el-button>
               </router-link>
             </div>

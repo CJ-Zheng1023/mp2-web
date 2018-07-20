@@ -2,9 +2,10 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Login from 'components/user/Login'
 import Register from 'components/user/Register'
-import Search from 'components/ipc/Search'
+import Ipc from 'components/ipc/Ipc'
 import Result from 'components/ipc/Result'
 import Index from 'components/Index'
+import Address from 'components/address/Address'
 
 Vue.use(Router)
 
@@ -38,10 +39,10 @@ let router = new Router({
     },
     {
       path: '/ipc',
-      name: 'Search',
-      component: Search,
+      name: 'Ipc',
+      component: Ipc,
       meta: {
-        title: 'IPC检索',
+        title: 'IPC标引',
         requireAuth: true
       }
     },
@@ -50,7 +51,16 @@ let router = new Router({
       name: 'Result',
       component: Result,
       meta: {
-        title: 'IPC检索结果',
+        title: 'IPC标引',
+        requireAuth: true
+      }
+    },
+    {
+      path: '/address',
+      name: 'Address',
+      component: Address,
+      meta: {
+        title: '地址标引',
         requireAuth: true
       }
     }
