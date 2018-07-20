@@ -75,7 +75,7 @@ export default {
               window.localStorage.setItem('token', this.token)
               window.localStorage.setItem('userId', this.user.id)
               window.localStorage.setItem('username', this.user.username)
-              this.$router.push({path: '/ipc'})
+              this.$router.push({path: '/'})
             }
             this.ifLoading = false
           })
