@@ -15,7 +15,7 @@
             </el-form>
           </div>
           <div class="table">
-            <el-table :data="addressMarkFormList" border style="width: 100%">
+            <el-table :data="addressMarkList" border style="width: 100%">
               <el-table-column prop="an" label="申请号" width="200">
               </el-table-column>
               <el-table-column prop="address" label="地址" width="330">
@@ -24,10 +24,10 @@
               </el-table-column>
               <el-table-column label="标引数据" width="380">
                 <template slot-scope="scope">
-                  <el-input v-model="province" placeholder="省/直辖市"></el-input>
-                  <el-input v-model="city" placeholder="市"></el-input>
-                  <el-input v-model="area" placeholder="区/县"></el-input>
-                  <el-input v-model="town" placeholder="镇"></el-input>
+                  <el-input v-model="scope.row.province" placeholder="省/直辖市"></el-input>
+                  <el-input v-model="scope.row.city" placeholder="市"></el-input>
+                  <el-input v-model="scope.row.area" placeholder="区/县"></el-input>
+                  <el-input v-model="scope.row.town" placeholder="镇"></el-input>
                 </template>
               </el-table-column>
               <el-table-column label="地图">
@@ -36,6 +36,9 @@
                 </template>
               </el-table-column>
             </el-table>
+          </div>
+          <div class="action">
+            <el-button type="primary" @click="save">保存标引词</el-button>
           </div>
         </el-card>
       </div>
@@ -57,31 +60,13 @@ export default {
   computed: {
     ...mapState('addressModule', [
       'addressMarkList'
-    ]),
-    addressMarkFormList () {
-      // let arr = []
-      this.addressMarkList.forEach(item => {
-        /* let newItem = {
-          id: item.id,
-          an: item.an,
-          address: item.address,
-          zip: item.zip
-        }
-        arr.push(newItem) */
-        this.$set(item, 'marked', '')
-        this.$set(item, 'province', '')
-        this.$set(item, 'city', '')
-        this.$set(item, 'area', '')
-        this.$set(item, 'town', '')
-        this.$set(item, 'status', 1)
-      })
-      return this.addressMarkList
-    }
+    ])
   },
   methods: {
     ...mapActions('addressModule', [
       'showMarking',
-      'search'
+      'search',
+      'saveMark'
     ]),
     random () {
       this.pageLoading = true
@@ -89,7 +74,27 @@ export default {
         this.pageLoading = false
       })
     },
-    handleClick () {}
+    handleClick () {},
+    save () {
+      let marks = []
+      this.addressMarkList.forEach(item => {
+        marks.push({
+          marked: item['item'],
+          province: item['province'],
+          city: item['city'],
+          area: item['area'],
+          town: item['town'],
+          status: item['status']
+        })
+      })
+      this.saveMark(marks).then(data => {
+        if (data.flag) {
+          alert('success')
+        } else {
+          alert('error')
+        }
+      })
+    }
   },
   components: {
     SearchHeader
@@ -111,8 +116,15 @@ export default {
   .search{
     text-align: center;
   }
+  .search .el-input{
+    width: 300px;
+  }
   .table .el-input{
     display: inline-block;
     width: 80px;
+  }
+  .action{
+    margin-top: 20px;
+    text-align: right;
   }
 </style>

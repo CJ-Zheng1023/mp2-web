@@ -1,5 +1,15 @@
 import axios from '../../config/axios'
 const MODULE_CONTEXT = '/address'
+function _addFormProperties (list) {
+  list.forEach(item => {
+    item['marked'] = ''
+    item['province'] = ''
+    item['city'] = ''
+    item['area'] = ''
+    item['town'] = ''
+    item['status'] = 1
+  })
+}
 export default {
   namespaced: true,
   state () {
@@ -9,9 +19,11 @@ export default {
   },
   mutations: {
     showMarking (state, data) {
+      _addFormProperties(data.addressMarkList)
       state.addressMarkList = data.addressMarkList
     },
     search (state, data) {
+      _addFormProperties(data.addressMarkList)
       state.addressMarkList = data.addressMarkList
     }
   },
@@ -31,6 +43,17 @@ export default {
         axios.get(MODULE_CONTEXT + `/search/random?token=${window.localStorage.getItem('token')}&keyword=${keyword}`).then(response => {
           commit('search', response.data)
           resolve()
+        }).catch(e => {
+          console.log(e)
+        })
+      })
+    },
+    saveMark (context, marks) {
+      return new Promise((resolve, reject) => {
+        axios.post(MODULE_CONTEXT + `/save?token=${window.localStorage.getItem('token')}`, {
+          markAddressList: JSON.stringify(marks)
+        }).then(response => {
+          resolve(response.data)
         }).catch(e => {
           console.log(e)
         })
