@@ -1,28 +1,25 @@
 import axios from '../../config/axios'
-import Vue from 'vue'
 const MODULE_CONTEXT = '/ipc'
 export default {
   namespaced: true,
-  state: {
-    data () {
-      return {
-        ipcResult: '',
-        patentList: '',
-        pagination: '',
-        markList: []
-      }
+  state () {
+    return {
+      ipcResult: '',
+      patentList: '',
+      pagination: '',
+      markList: []
     }
   },
   mutations: {
     searchIpc (state, data) {
-      Vue.set(state, 'ipcResult', data.ipcResult)
+      state.ipcResult = data.ipcResult
     },
     searchPatentList (state, data) {
-      Vue.set(state, 'patentList', data.patentList)
-      Vue.set(state, 'pagination', data.pagination)
+      state.patentList = data.patentList
+      state.pagination = data.pagination
     },
     showMarkList (state, data) {
-      Vue.set(state, 'markList', data.markList)
+      state.markList = data.markList
     }
   },
   actions: {

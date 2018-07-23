@@ -1,26 +1,23 @@
 import axios from '../../config/axios'
-import Vue from 'vue'
 const MODULE_CONTEXT = '/user'
 export default {
   namespaced: true,
-  state: {
-    data () {
-      return {
-        loginCode: '',
-        user: '',
-        token: '',
-        registerCode: ''
-      }
+  state () {
+    return {
+      loginCode: '',
+      user: '',
+      token: '',
+      registerCode: ''
     }
   },
   mutations: {
     login (state, data) {
-      Vue.set(state, 'loginCode', data.code)
-      Vue.set(state, 'user', data.user)
-      Vue.set(state, 'token', data.token)
+      state.loginCode = data.code
+      state.user = data.user
+      state.token = data.token
     },
     register (state, data) {
-      Vue.set(state, 'registerCode', data.code)
+      state.registerCode = data.code
     }
   },
   actions: {
