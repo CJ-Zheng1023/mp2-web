@@ -10,7 +10,7 @@
                 <el-input v-model="formSearch.keyword" placeholder="请输入关键词"></el-input>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="random">随 机 <i class="fa fa-random"></i></el-button>
+                <el-button type="primary" @click="random">查 询 <i class="fa fa-random"></i></el-button>
               </el-form-item>
             </el-form>
           </div>

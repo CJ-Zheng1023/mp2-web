@@ -26,10 +26,10 @@ export default {
     search ({commit}, ipc) {
       return new Promise((resolve, reject) => {
         axios.all([
-          // axios.get(MODULE_CONTEXT + `/search/${ipc}?token=${window.localStorage.getItem('token')}`),
-          axios.get(MODULE_CONTEXT + `/search/A08?token=${window.localStorage.getItem('token')}`),
-          // axios.get(MODULE_CONTEXT + `/patent/list/${ipc}?start=0&size=12&token=${window.localStorage.getItem('token')}`)
-          axios.get(MODULE_CONTEXT + `/search/list/A08?start=0&size=12&token=${window.localStorage.getItem('token')}`)
+          axios.get(MODULE_CONTEXT + `/search/${ipc}?token=${window.localStorage.getItem('token')}`),
+          // axios.get(MODULE_CONTEXT + `/search/A08?token=${window.localStorage.getItem('token')}`),
+          axios.get(MODULE_CONTEXT + `/search/list/${ipc}?start=0&size=12&token=${window.localStorage.getItem('token')}`)
+          // axios.get(MODULE_CONTEXT + `/search/list/A08?start=0&size=12&token=${window.localStorage.getItem('token')}`)
         ]).then(axios.spread((ipcResponse, patentResponse) => {
           commit('searchIpc', ipcResponse.data)
           commit('searchPatentList', patentResponse.data)
@@ -41,8 +41,8 @@ export default {
     },
     searchPatentList ({commit}, {ipc, start, size}) {
       return new Promise((resolve, reject) => {
-        // axios.get(MODULE_CONTEXT + `/patent/list/${ipc}?start=${start}&size=${size}&token=${window.localStorage.getItem('token')}`).then(response => {
-        axios.get(MODULE_CONTEXT + `/search/list/A08?start=${start}&size=${size}&token=${window.localStorage.getItem('token')}`).then(response => {
+        axios.get(MODULE_CONTEXT + `/search/list/${ipc}?start=${start}&size=${size}&token=${window.localStorage.getItem('token')}`).then(response => {
+        // axios.get(MODULE_CONTEXT + `/search/list/A08?start=${start}&size=${size}&token=${window.localStorage.getItem('token')}`).then(response => {
           commit('searchPatentList', response.data)
           resolve()
         }).catch(e => {
@@ -52,8 +52,8 @@ export default {
     },
     showMarkList ({commit}, an) {
       return new Promise((resolve, reject) => {
-        // axios.get(MODULE_CONTEXT + `/list/${an}?token=${window.localStorage.getItem('token')}`).then(response => {
-        axios.get(MODULE_CONTEXT + `/list/A08?token=${window.localStorage.getItem('token')}`).then(response => {
+        axios.get(MODULE_CONTEXT + `/list/${an}?token=${window.localStorage.getItem('token')}`).then(response => {
+        // axios.get(MODULE_CONTEXT + `/list/A08?token=${window.localStorage.getItem('token')}`).then(response => {
           commit('showMarkList', response.data)
           resolve()
         }).catch(e => {

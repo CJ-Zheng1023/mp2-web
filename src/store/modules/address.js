@@ -2,6 +2,9 @@ import axios from '../../config/axios'
 import province from '../../assets/scripts/province'
 const MODULE_CONTEXT = '/address'
 function _addFormProperties (list) {
+  if (!list) {
+    return
+  }
   list.forEach(item => {
     let prov = province.getProvince(item['address'])
     item['marked'] = ''
@@ -23,11 +26,11 @@ export default {
   mutations: {
     showMarking (state, data) {
       _addFormProperties(data.addressMarkList)
-      state.addressMarkList = data.addressMarkList
+      state.addressMarkList = data.addressMarkList || []
     },
     search (state, data) {
       _addFormProperties(data.addressMarkList)
-      state.addressMarkList = data.addressMarkList
+      state.addressMarkList = data.addressMarkList || []
     }
   },
   actions: {
