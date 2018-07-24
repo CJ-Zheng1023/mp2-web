@@ -1,13 +1,16 @@
 import axios from '../../config/axios'
+import province from '../../assets/scripts/province'
 const MODULE_CONTEXT = '/address'
 function _addFormProperties (list) {
   list.forEach(item => {
+    let prov = province.getProvince(item['address'])
     item['marked'] = ''
-    item['province'] = ''
+    item['province'] = prov
     item['city'] = ''
     item['area'] = ''
     item['town'] = ''
-    item['status'] = 1
+    item['status'] = prov ? 1 : ''
+    item['url'] = `http://api.map.baidu.com/geocoder?address=${item['address']}&output=html&src=mp2`
   })
 }
 export default {
