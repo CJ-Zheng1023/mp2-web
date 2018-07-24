@@ -12,7 +12,7 @@ function _addFormProperties (list) {
     item['city'] = ''
     item['area'] = ''
     item['town'] = ''
-    item['status'] = prov ? 1 : ''
+    item['status'] = prov ? 1 : 0
     item['url'] = `http://api.map.baidu.com/geocoder?address=${item['address']}&output=html&src=mp2`
   })
 }

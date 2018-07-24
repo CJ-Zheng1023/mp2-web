@@ -27,7 +27,7 @@
                   <div class="input-item input-item-icon">
                     <input v-model="scope.row.province" @blur="checkProvince(scope.row, $event)" placeholder="省/直辖市"/>
                     <i v-if="scope.row.status === 1" class="fa fa-check success"></i>
-                    <i v-else-if="scope.row.status === 0" class="fa fa-exclamation warning"></i>
+                    <i v-else-if="scope.row.status === 2" class="fa fa-exclamation warning"></i>
                   </div>
                   <div class="input-item">
                     <input v-model="scope.row.city" placeholder="市" />
@@ -57,7 +57,7 @@
             <div class="input-item input-item-icon validate" :class="{'error': mark.province.isError}">
               <input v-model="mark.province.value" @blur="validate(mark, 'province', $event)" placeholder="省/直辖市"/>
               <i v-if="mark.status === 1" class="fa fa-check success"></i>
-              <i v-else-if="mark.status === 0" class="fa fa-exclamation warning"></i>
+              <i v-else-if="mark.status === 2" class="fa fa-exclamation warning"></i>
             </div>
             <div class="input-item validate" :class="{'error': mark.city.isError}">
               <input v-model="mark.city.value" @blur="validate(mark, 'city', $event)" placeholder="市" />
@@ -106,7 +106,7 @@ export default {
         },
         area: '',
         town: '',
-        status: ''
+        status: 0
       }
     }
   },
@@ -132,7 +132,7 @@ export default {
         },
         area: '',
         town: '',
-        status: ''
+        status: 0
       }
     },
     openDialog () {
@@ -146,7 +146,7 @@ export default {
       let target = event.target || event.srcElement
       let value = target.value
       if (!value) {
-        data.status = ''
+        data.status = 0
         data[key]['isError'] = true
         return
       }
@@ -157,20 +157,20 @@ export default {
       if (province.check(value)) {
         data.status = 1
       } else {
-        data.status = 0
+        data.status = 2
       }
     },
     checkProvince (data, event) {
       let target = event.target || event.srcElement
       let value = target.value
       if (!value) {
-        data.status = ''
+        data.status = 0
         return
       }
       if (province.check(value)) {
         data.status = 1
       } else {
-        data.status = 0
+        data.status = 2
       }
     },
     ...mapActions('addressModule', [
