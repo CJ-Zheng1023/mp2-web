@@ -141,7 +141,7 @@ export default {
     },
     clickSearchBtn () {
       if (!this.saved) {
-        this.$confirm('您尚有未保存的标引词, 是否离开?', '提示', {
+        this.$confirm('您尚有未保存的标引词, 是否放弃保存?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
