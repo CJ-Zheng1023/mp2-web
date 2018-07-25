@@ -1,7 +1,7 @@
 import axios from '../../config/axios'
 import province from '../../assets/scripts/province'
+import GLOBAL from '../../config/global'
 const MODULE_CONTEXT = '/address'
-const ZIP_URL = 'http://api.avatardata.cn/PostNumber/QueryPostnumber?key=c0aaf0b9f372415ba7c50995311dabc8&postnumber='
 function _addFormProperties (list) {
   if (!list) {
     return
@@ -70,10 +70,19 @@ export default {
     },
     showAddressByZip (context, zip) {
       return new Promise((resolve, reject) => {
-        axios.get(`${ZIP_URL}${zip}`).then(response => {
+        axios({
+          url: GLOBAL.ZIP_API.url,
+          method: 'get',
+          params: {
+            showapi_appid: GLOBAL.ZIP_API.appId,
+            showapi_sign: GLOBAL.ZIP_API.signId,
+            key: zip
+          }
+        }).then(response => {
           resolve(response.data)
         }).catch(e => {
           console.log(e)
+          reject(e)
         })
       })
     }

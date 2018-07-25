@@ -28,7 +28,7 @@
                     :title="scope.row.popoverTitle"
                     trigger="hover"
                     :content="scope.row.popoverContent">
-                    <a href="javascript:;" slot="reference" @mouseover="mouseoverZip(scope.row)">{{scope.row.zip}}</a>
+                    <a href="javascript:;" class="zip-content" slot="reference" @mouseover="mouseoverZip(scope.row)">{{scope.row.zip}}</a>
                   </el-popover>
                 </template>
               </el-table-column>
@@ -131,7 +131,12 @@ export default {
         return
       }
       this.showAddressByZip(row.zip).then(data => {
-        console.log(data)
+        let resBody = data['showapi_res_body']
+        row.popoverTitle = '查询结果'
+        row.popoverContent = resBody['address'] || '地址查询失败'
+      }).catch(e => {
+        row.popoverTitle = '查询结果'
+        row.popoverContent = '地址查询失败'
       })
     },
     clickSearchBtn () {
@@ -316,5 +321,9 @@ export default {
   }
   .dialog-body{
     text-align: center;
+  }
+  .zip-content{
+    text-decoration: none;
+    color: #606266;
   }
 </style>
