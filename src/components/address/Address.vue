@@ -10,7 +10,7 @@
                 <el-input v-model="formSearch.keyword" placeholder="请输入关地址"></el-input>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="random">查 询 <i class="fa fa-search"></i></el-button>
+                <el-button type="primary" @click="clickSearchBtn">查 询 <i class="fa fa-search"></i></el-button>
                 <el-button type="success" @click="openDialog">批量标引 <i class="fa fa-bookmark"></i></el-button>
               </el-form-item>
             </el-form>
@@ -49,18 +49,18 @@
             </el-table>
           </div>
           <div class="action">
-            <el-button type="primary" @click="save" :loading="saveBtnLoading">保存标引词</el-button>
+            <el-button type="primary" @click="save" :loading="saveBtnLoading" :disabled="saved">保存标引词</el-button>
           </div>
         </el-card>
         <el-dialog title="批量标引" :visible.sync="dialogVisible" @close="closeDialog">
           <div class="dialog-body">
-            <div class="input-item input-item-icon validate" :class="{'error': mark.province.isError}">
-              <input v-model="mark.province.value" @blur="validate(mark, 'province', $event)" placeholder="省/直辖市"/>
+            <div class="input-item input-item-icon">
+              <input v-model="mark.province" @blur="checkProvince(mark, $event)" placeholder="省/直辖市"/>
               <i v-if="mark.status === 1" class="fa fa-check success"></i>
               <i v-else-if="mark.status === 2" class="fa fa-exclamation warning"></i>
             </div>
-            <div class="input-item validate" :class="{'error': mark.city.isError}">
-              <input v-model="mark.city.value" @blur="validate(mark, 'city', $event)" placeholder="市" />
+            <div class="input-item">
+              <input v-model="mark.city" placeholder="市" />
             </div>
             <div class="input-item">
               <input v-model="mark.area" placeholder="区/县"/>
@@ -69,12 +69,9 @@
               <input v-model="mark.town" placeholder="镇"/>
             </div>
           </div>
-          <p class="error-message-area" :class="{'show-error-message': showErrorMessage}">
-            省/直辖市、市为必填项
-          </p>
           <div slot="footer">
             <el-button @click="closeDialog">取 消</el-button>
-            <el-button type="primary" @click="batch" :loading="batchBtnLoading">批量保存</el-button>
+            <el-button type="primary" @click="batch">确定</el-button>
           </div>
         </el-dialog>
       </div>
@@ -93,17 +90,10 @@ export default {
       },
       pageLoading: false,
       dialogVisible: false,
-      batchBtnLoading: false,
       saveBtnLoading: false,
       mark: {
-        province: {
-          value: '',
-          isError: false
-        },
-        city: {
-          value: '',
-          isError: false
-        },
+        province: '',
+        city: '',
         area: '',
         town: '',
         status: 0
@@ -114,22 +104,35 @@ export default {
     ...mapState('addressModule', [
       'addressMarkList'
     ]),
-    showErrorMessage () {
-      let mark = this.mark
-      return mark.province.isError || mark.city.isError
+    saved () {
+      let flag = true
+      for (let i = 0, len = this.addressMarkList.length; i < len; i++) {
+        let item = this.addressMarkList[i]
+        if (item['province'] && item['city']) {
+          flag = false
+          break
+        }
+      }
+      return flag
     }
   },
   methods: {
+    clickSearchBtn () {
+      if (!this.saved) {
+        this.$confirm('您尚有未保存的标引词, 是否离开?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.random()
+        }).catch(() => {
+        })
+      }
+    },
     _clearMark () {
       this.mark = {
-        province: {
-          value: '',
-          isError: false
-        },
-        city: {
-          value: '',
-          isError: false
-        },
+        province: '',
+        city: '',
         area: '',
         town: '',
         status: 0
@@ -141,24 +144,6 @@ export default {
     closeDialog () {
       this._clearMark()
       this.dialogVisible = false
-    },
-    validate (data, key, event) {
-      let target = event.target || event.srcElement
-      let value = target.value
-      if (!value) {
-        data.status = 0
-        data[key]['isError'] = true
-        return
-      }
-      data[key]['isError'] = false
-      if (key !== 'province') {
-        return
-      }
-      if (province.check(value)) {
-        data.status = 1
-      } else {
-        data.status = 2
-      }
     },
     checkProvince (data, event) {
       let target = event.target || event.srcElement
@@ -184,50 +169,16 @@ export default {
         this.pageLoading = false
       })
     },
-    handleClick () {},
     batch () {
-      let marks = []
       let mark = this.mark
-      if (!mark.province.value) {
-        mark.province.isError = true
-      }
-      if (!mark.city.value) {
-        mark.city.isError = true
-      }
-      if (this.showErrorMessage) {
-        return
-      }
       this.addressMarkList.forEach(item => {
-        marks.push({
-          id: item['id'],
-          marked: '1',
-          province: mark['province'].value,
-          city: mark['city'].value,
-          area: mark['area'],
-          town: mark['town'],
-          status: mark['status']
-        })
+        item['province'] = mark['province']
+        item['city'] = mark['city']
+        item['area'] = mark['area']
+        item['town'] = mark['town']
+        item['status'] = mark['status']
       })
-      this.batchBtnLoading = true
-      this.saveMark(marks).then(data => {
-        if (data.flag) {
-          this.$alert('添加成功', '提示', {
-            confirmButtonText: '确定',
-            type: 'success'
-          }).then(action => {
-            this.random()
-            this._clearMark()
-            this.batchBtnLoading = false
-          })
-        } else {
-          this.$alert('添加失败', '提示', {
-            confirmButtonText: '确定',
-            type: 'error'
-          }).then(action => {
-            this.batchBtnLoading = false
-          })
-        }
-      })
+      this.dialogVisible = false
     },
     save () {
       let marks = []
@@ -308,20 +259,6 @@ export default {
   .input-item input:focus{
     border-color: #409EFF;
     outline: 0;
-  }
-  .input-item.validate.error input{
-    border-color: #F56C6C;
-  }
-  .input-item.validate.error input:hover, .input-item.validate.error input:focus{
-    border-color: #F56C6C;
-  }
-  .error-message-area{
-    display: none;
-    margin-left: 140px;
-  }
-  .show-error-message{
-    color: #F56C6C;
-    display: block;
   }
   input::-webkit-input-placeholder{
     color: #C9C1C1;
