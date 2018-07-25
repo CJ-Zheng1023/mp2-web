@@ -5,7 +5,7 @@ export default {
     return provinces.includes(str)
   },
   getProvince (address) {
-    let result = reg.exec(address)
+    let result = reg.exec(address.trim())
     if (result) {
       return result[0]
     }
