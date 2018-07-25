@@ -6,11 +6,12 @@
         <el-card>
           <div class="search">
             <el-form :inline="true" :model="formSearch" class="demo-form-inline">
-              <el-form-item label="关键词">
-                <el-input v-model="formSearch.keyword" placeholder="请输入关键词"></el-input>
+              <el-form-item label="地址">
+                <el-input v-model="formSearch.keyword" placeholder="请输入关地址"></el-input>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="random">查 询 <i class="fa fa-random"></i></el-button>
+                <el-button type="primary" @click="random">查 询 <i class="fa fa-search"></i></el-button>
+                <el-button type="success" @click="openDialog">批量标引 <i class="fa fa-bookmark"></i></el-button>
               </el-form-item>
             </el-form>
           </div>
@@ -49,7 +50,6 @@
           </div>
           <div class="action">
             <el-button type="primary" @click="save" :loading="saveBtnLoading">保存标引词</el-button>
-            <el-button type="success" @click="openDialog">批量标引</el-button>
           </div>
         </el-card>
         <el-dialog title="批量标引" :visible.sync="dialogVisible" @close="closeDialog">
