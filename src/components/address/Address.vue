@@ -1,8 +1,8 @@
 <template>
-  <div class="page page-search" v-loading="pageLoading">
+  <div class="page page-search">
     <search-header :ifSearch=false ></search-header>
     <div class="main">
-      <div class="address-container">
+      <div class="address-container" v-loading="pageLoading">
         <el-card>
           <div class="search">
             <el-form :inline="true" :model="formSearch" class="demo-form-inline">
