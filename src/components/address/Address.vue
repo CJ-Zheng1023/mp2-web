@@ -7,7 +7,7 @@
           <div class="search">
             <el-form :inline="true" :model="formSearch" class="demo-form-inline">
               <el-form-item label="地址">
-                <el-input v-model="formSearch.keyword" placeholder="请输入关地址"></el-input>
+                <el-input v-model="formSearch.keyword" placeholder="请输入地址"></el-input>
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" @click="clickSearchBtn">查 询 <i class="fa fa-search"></i></el-button>
