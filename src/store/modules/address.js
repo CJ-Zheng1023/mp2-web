@@ -1,6 +1,7 @@
 import axios from '../../config/axios'
 import province from '../../assets/scripts/province'
 const MODULE_CONTEXT = '/address'
+const ZIP_URL = 'http://api.avatardata.cn/PostNumber/QueryPostnumber?key=c0aaf0b9f372415ba7c50995311dabc8&postnumber='
 function _addFormProperties (list) {
   if (!list) {
     return
@@ -14,6 +15,8 @@ function _addFormProperties (list) {
     item['town'] = ''
     item['status'] = prov ? 1 : 0
     item['url'] = `http://api.map.baidu.com/geocoder?address=${item['address']}&output=html&src=mp2`
+    item['popoverContent'] = ''
+    item['popoverTitle'] = '加载中。。。'
   })
 }
 export default {
@@ -59,6 +62,15 @@ export default {
         axios.post(MODULE_CONTEXT + `/save?token=${window.localStorage.getItem('token')}`, {
           markAddressList: JSON.stringify(marks)
         }).then(response => {
+          resolve(response.data)
+        }).catch(e => {
+          console.log(e)
+        })
+      })
+    },
+    showAddressByZip (context, zip) {
+      return new Promise((resolve, reject) => {
+        axios.get(`${ZIP_URL}${zip}`).then(response => {
           resolve(response.data)
         }).catch(e => {
           console.log(e)

@@ -21,7 +21,16 @@
               </el-table-column>
               <el-table-column prop="address" label="地址" width="330">
               </el-table-column>
-              <el-table-column prop="zip" label="邮编" width="120">
+              <el-table-column label="邮编" width="120">
+                <template slot-scope="scope">
+                  <el-popover
+                    placement="top"
+                    :title="scope.row.popoverTitle"
+                    trigger="hover"
+                    :content="scope.row.popoverContent">
+                    <a href="javascript:;" slot="reference" @mouseover="mouseoverZip(scope.row)">{{scope.row.zip}}</a>
+                  </el-popover>
+                </template>
               </el-table-column>
               <el-table-column label="标引数据" width="400">
                 <template slot-scope="scope">
@@ -117,6 +126,14 @@ export default {
     }
   },
   methods: {
+    mouseoverZip (row) {
+      if (row.popoverContent) {
+        return
+      }
+      this.showAddressByZip(row.zip).then(data => {
+        console.log(data)
+      })
+    },
     clickSearchBtn () {
       if (!this.saved) {
         this.$confirm('您尚有未保存的标引词, 是否离开?', '提示', {
@@ -161,7 +178,8 @@ export default {
     ...mapActions('addressModule', [
       'showMarking',
       'search',
-      'saveMark'
+      'saveMark',
+      'showAddressByZip'
     ]),
     random () {
       this.pageLoading = true
