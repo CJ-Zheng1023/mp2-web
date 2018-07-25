@@ -2,21 +2,23 @@
   <div class="page page-search">
     <search-header :ifSearch=false ></search-header>
     <div class="main">
-      <el-card>
-        <el-form :model="form" :inline="true" ref="form" label-width="80px">
-          <el-form-item label="IPC号">
-            <el-input v-model="form.ipc"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="onSubmit">检 索</el-button>
-          </el-form-item>
-        </el-form>
-        <div class="tags">
-          <div class="tag-item" @click="setFormIpc(ipc)" v-for="ipc in historyIpcs" :key="ipc">
-            <el-tag type="primary">{{ipc}}</el-tag>
+      <div class="ipc-container">
+        <el-card>
+          <el-form :model="form" :inline="true" ref="form" label-width="80px">
+            <el-form-item label="IPC号">
+              <el-input v-model="form.ipc"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="onSubmit">检 索</el-button>
+            </el-form-item>
+          </el-form>
+          <div class="tags">
+            <div class="tag-item" @click="setFormIpc(ipc)" v-for="ipc in historyIpcs" :key="ipc">
+              <el-tag type="primary">{{ipc}}</el-tag>
+            </div>
           </div>
-        </div>
-      </el-card>
+        </el-card>
+      </div>
     </div>
   </div>
 </template>
@@ -61,6 +63,11 @@ export default {
 }
 </script>
 <style scoped>
+  .ipc-container{
+    padding: 15px;
+    border-radius: 7px;
+    background-color: rgba(233, 233, 233, .5);
+  }
   .el-form{
     text-align: center;
     margin-top: 200px;
