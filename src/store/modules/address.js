@@ -16,7 +16,7 @@ function _addFormProperties (list) {
     item['status'] = prov ? 1 : 0
     item['url'] = `http://api.map.baidu.com/geocoder?address=${item['address']}&output=html&src=mp2`
     item['popoverContent'] = ''
-    item['popoverTitle'] = '加载中。。。'
+    item['popoverTitle'] = '加载中...'
   })
 }
 export default {
