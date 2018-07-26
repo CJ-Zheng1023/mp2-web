@@ -61,7 +61,7 @@
                     <el-tooltip v-if="scope.row.marked === '1'" class="item" effect="dark" content="必填字段填完" placement="top">
                       <i class="fa fa-circle-o" style="color: #67C23A;"></i>
                     </el-tooltip>
-                    <el-tooltip v-if="scope.row.marked === '2'" class="item" effect="dark" content="请填写省/直辖市、市" placement="top">
+                    <el-tooltip v-else-if="scope.row.marked === '2'" class="item" effect="dark" content="请填写省/直辖市、市" placement="top">
                       <i class="fa fa-warning" style="color: #E6A23C"></i>
                     </el-tooltip>
                   </div>
