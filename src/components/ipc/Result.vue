@@ -66,7 +66,7 @@
               </el-col>
             </el-row>
           </div>
-          <patent-dialog v-show="dialogVisible" @mark="markPatent" :ipc="ipcResult.IC" :message="message" @prev="prevPatent" @next="nextPatent" :patent="currentPatent" @close="dialogVisible=false" :visible="dialogVisible"></patent-dialog>
+          <patent-dialog v-show="dialogVisible" @unmark="unmarkPatent" @mark="markPatent" :ipc="ipcResult.IC" :message="message" @prev="prevPatent" @next="nextPatent" :patent="currentPatent" @close="dialogVisible=false" :visible="dialogVisible"></patent-dialog>
         </el-col>
         <el-col :span="16" v-else>
           <el-card class="box-card">
@@ -177,6 +177,9 @@ export default {
     },
     markPatent () {
       this.currentPatent.marked = 'true'
+    },
+    unmarkPatent () {
+      this.currentPatent.marked = 'false'
     },
     ...mapActions('ipcModule', [
       'searchPatentList',

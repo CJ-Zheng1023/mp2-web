@@ -257,6 +257,9 @@ export default {
               message: '删除成功!'
             })
             this.showMarkList(this.patent.NRD_AN).then(() => {
+              if (this.markList.length === 0) {
+                this.$emit('unmark')
+              }
             })
           } else {
             this.$message({
