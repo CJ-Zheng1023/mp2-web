@@ -17,11 +17,11 @@
           </div>
           <div class="table">
             <el-table :data="addressMarkList" border style="width: 100%">
-              <el-table-column prop="an" label="申请号" width="180">
+              <el-table-column prop="an" label="申请号" width="170">
               </el-table-column>
-              <el-table-column prop="address" label="地址" width="330">
+              <el-table-column prop="address" label="地址" width="300">
               </el-table-column>
-              <el-table-column label="邮编" width="120">
+              <el-table-column label="邮编" width="90">
                 <template slot-scope="scope">
                   <el-popover
                     placement="top"
@@ -35,12 +35,12 @@
               <el-table-column label="标引数据" width="400">
                 <template slot-scope="scope">
                   <div class="input-item input-item-icon">
-                    <input v-model="scope.row.province" @blur="checkProvince(scope.row, $event)" placeholder="省/直辖市"/>
+                    <input @input="input(scope.row, 'province', $event)" :value="scope.row.province" @blur="checkProvince(scope.row, $event)" placeholder="省/直辖市"/>
                     <i v-if="scope.row.status === 1" class="fa fa-check success"></i>
                     <i v-else-if="scope.row.status === 2" class="fa fa-exclamation warning"></i>
                   </div>
                   <div class="input-item">
-                    <input v-model="scope.row.city" placeholder="市" />
+                    <input @input="input(scope.row, 'city', $event)" :value="scope.row.city" placeholder="市" />
                   </div>
                   <div class="input-item">
                     <input v-model="scope.row.area" placeholder="区/县"/>
@@ -53,6 +53,18 @@
               <el-table-column label="地图">
                 <template slot-scope="scope">
                   <a target="_blank" :href="scope.row.url">查看</a>
+                </template>
+              </el-table-column>
+              <el-table-column label="状态" width="60">
+                <template slot-scope="scope">
+                  <div style="text-align: center">
+                    <el-tooltip v-if="scope.row.marked === '1'" class="item" effect="dark" content="必填字段填完" placement="top">
+                      <i class="fa fa-circle-o" style="color: #67C23A;"></i>
+                    </el-tooltip>
+                    <el-tooltip v-if="scope.row.marked === '2'" class="item" effect="dark" content="请填写省/直辖市、市" placement="top">
+                      <i class="fa fa-warning" style="color: #E6A23C"></i>
+                    </el-tooltip>
+                  </div>
                 </template>
               </el-table-column>
             </el-table>
@@ -105,7 +117,8 @@ export default {
         city: '',
         area: '',
         town: '',
-        status: 0
+        status: 0,
+        marked: ''
       }
     }
   },
@@ -126,6 +139,19 @@ export default {
     }
   },
   methods: {
+    _checkMarked (data) {
+      if (data['province'] && data['city']) {
+        data['marked'] = '1'
+      } else if (!data['province'] && !data['city']) {
+        data['marked'] = ''
+      } else {
+        data['marked'] = '2'
+      }
+    },
+    input (row, key, event) {
+      row[key] = event.target.value
+      this._checkMarked(row)
+    },
     mouseoverZip (row) {
       if (row.popoverContent) {
         return
@@ -159,7 +185,8 @@ export default {
         city: '',
         area: '',
         town: '',
-        status: 0
+        status: 0,
+        marked: ''
       }
     },
     openDialog () {
@@ -196,12 +223,14 @@ export default {
     },
     batch () {
       let mark = this.mark
+      this._checkMarked(mark)
       this.addressMarkList.forEach(item => {
         item['province'] = mark['province']
         item['city'] = mark['city']
         item['area'] = mark['area']
         item['town'] = mark['town']
         item['status'] = mark['status']
+        item['marked'] = mark['marked']
       })
       this.dialogVisible = false
     },
