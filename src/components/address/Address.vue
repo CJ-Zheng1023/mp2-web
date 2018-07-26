@@ -149,6 +149,8 @@ export default {
           this.random()
         }).catch(() => {
         })
+      } else {
+        this.random()
       }
     },
     _clearMark () {
