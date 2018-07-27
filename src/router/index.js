@@ -1,11 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Login from 'components/user/Login'
-import Register from 'components/user/Register'
-import Ipc from 'components/ipc/Ipc'
-import Result from 'components/ipc/Result'
-import Index from 'components/Index'
-import Address from 'components/address/Address'
 
 Vue.use(Router)
 
@@ -15,7 +9,7 @@ let router = new Router({
     {
       path: '/login',
       name: 'Login',
-      component: Login,
+      component: () => import('../components/user/Login'),
       meta: {
         title: '登录'
       }
@@ -23,7 +17,7 @@ let router = new Router({
     {
       path: '/register',
       name: 'Register',
-      component: Register,
+      component: () => import('../components/user/Register'),
       meta: {
         title: '注册'
       }
@@ -31,7 +25,7 @@ let router = new Router({
     {
       path: '/',
       name: 'Index',
-      component: Index,
+      component: () => import('../components/Index'),
       meta: {
         title: '标引平台首页',
         requireAuth: true
@@ -40,7 +34,7 @@ let router = new Router({
     {
       path: '/ipc',
       name: 'Ipc',
-      component: Ipc,
+      component: () => import('../components/ipc/Ipc'),
       meta: {
         title: 'IPC标引',
         requireAuth: true
@@ -49,7 +43,7 @@ let router = new Router({
     {
       path: '/ipc/search/:ipc',
       name: 'Result',
-      component: Result,
+      component: () => import('../components/ipc/Result'),
       meta: {
         title: 'IPC标引',
         requireAuth: true
@@ -58,7 +52,7 @@ let router = new Router({
     {
       path: '/address',
       name: 'Address',
-      component: Address,
+      component: () => import('../components/address/Address'),
       meta: {
         title: '地址标引',
         requireAuth: true
