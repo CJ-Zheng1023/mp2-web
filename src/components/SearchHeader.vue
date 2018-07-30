@@ -125,13 +125,13 @@ export default {
   .el-dropdown-link{
     cursor: pointer;
   }
-  .btn-menu{
+  .navbar .btn-menu{
     line-height: 54px;
     float: left;
     margin-left: -40px;
     cursor: pointer;
   }
-  .btn-menu:focus{
+  .navbar .btn-menu:focus{
     outline: none;
   }
   .side-menu{

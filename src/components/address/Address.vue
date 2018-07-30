@@ -219,6 +219,13 @@ export default {
       this.pageLoading = true
       this.search(this.formSearch.keyword).then(() => {
         this.pageLoading = false
+      }).catch(e => {
+        this.$alert('查询超时', '提示', {
+          confirmButtonText: '确定',
+          type: 'error'
+        }).then(action => {
+          this.pageLoading = false
+        })
       })
     },
     batch () {
@@ -275,6 +282,13 @@ export default {
     this.pageLoading = true
     this.showMarking().then(() => {
       this.pageLoading = false
+    }).catch(e => {
+      this.$alert('查询超时', '提示', {
+        confirmButtonText: '确定',
+        type: 'error'
+      }).then(action => {
+        this.pageLoading = false
+      })
     })
   }
 }
