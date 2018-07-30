@@ -17,30 +17,35 @@
           </div>
           <div class="table">
             <el-table :data="addressMarkList" border style="width: 100%">
-              <el-table-column prop="an" label="申请号" width="170">
+              <el-table-column prop="an" label="申请号" width="160">
               </el-table-column>
-              <el-table-column prop="address" label="地址" width="300">
+              <el-table-column prop="appName" label="申请人" width="160">
               </el-table-column>
-              <el-table-column label="邮编" width="90">
+              <el-table-column label="地址" width="290">
+                <template slot-scope="scope">
+                  <a target="_blank" :href="scope.row.url">{{scope.row.address}}</a>
+                </template>
+              </el-table-column>
+              <el-table-column label="邮编" width="80">
                 <template slot-scope="scope">
                   <el-popover
                     placement="top"
                     :title="scope.row.popoverTitle"
                     trigger="hover"
-                    :content="scope.row.popoverContent">
-                    <a href="javascript:;" class="zip-content" slot="reference" @mouseover="mouseoverZip(scope.row)">{{scope.row.zip}}</a>
+                    :content="scope.row.zip">
+                    <a href="javascript:;" class="zip-content" slot="reference">{{scope.row.zip}}</a>
                   </el-popover>
                 </template>
               </el-table-column>
-              <el-table-column label="标引数据" width="400">
+              <el-table-column label="标引数据" width="330">
                 <template slot-scope="scope">
                   <div class="input-item input-item-icon">
-                    <input @input="input(scope.row, 'province', $event)" :value="scope.row.province" @blur="checkProvince(scope.row, $event)" placeholder="省/直辖市"/>
+                    <input v-model="scope.row.province" @blur="checkProvince(scope.row, $event)" placeholder="省/直辖市"/>
                     <i v-if="scope.row.status === 1" class="fa fa-check success"></i>
                     <i v-else-if="scope.row.status === 2" class="fa fa-exclamation warning"></i>
                   </div>
                   <div class="input-item">
-                    <input @input="input(scope.row, 'city', $event)" :value="scope.row.city" placeholder="市" />
+                    <input v-model="scope.row.city" placeholder="市" />
                   </div>
                   <div class="input-item">
                     <input v-model="scope.row.area" placeholder="区/县"/>
@@ -50,20 +55,10 @@
                   </div>
                 </template>
               </el-table-column>
-              <el-table-column label="地图">
+              <el-table-column label="标引规则">
                 <template slot-scope="scope">
-                  <a target="_blank" :href="scope.row.url">查看</a>
-                </template>
-              </el-table-column>
-              <el-table-column label="状态" width="60">
-                <template slot-scope="scope">
-                  <div style="text-align: center">
-                    <el-tooltip v-if="scope.row.marked === '1'" class="item" effect="dark" content="必填字段填完" placement="top">
-                      <i class="fa fa-circle-o" style="color: #67C23A;"></i>
-                    </el-tooltip>
-                    <el-tooltip v-else-if="scope.row.marked === '2'" class="item" effect="dark" content="请填写省/直辖市、市" placement="top">
-                      <i class="fa fa-warning" style="color: #E6A23C"></i>
-                    </el-tooltip>
+                  <div class="input-item input-item-rule">
+                    <input v-model="scope.row.rule" placeholder="标引规则"/>
                   </div>
                 </template>
               </el-table-column>
@@ -243,6 +238,7 @@ export default {
     },
     save () {
       let marks = []
+      let rules = []
       this.addressMarkList.forEach(item => {
         marks.push({
           id: item['id'],
@@ -253,9 +249,20 @@ export default {
           town: item['town'],
           status: item['status']
         })
+        let rule = item['rule']
+        let province = item['province']
+        let city = item['city']
+        if (rule && province && city) {
+          rules.push({
+            province: province,
+            city: city,
+            area: item['area'],
+            rule: item['rule']
+          })
+        }
       })
       this.saveBtnLoading = true
-      this.saveMark(marks).then(data => {
+      this.saveMark({marks, rules}).then(data => {
         if (data.flag) {
           this.$alert('添加成功', '提示', {
             confirmButtonText: '确定',
@@ -272,6 +279,8 @@ export default {
             this.saveBtnLoading = false
           })
         }
+      }).catch(e => {
+        this.saveBtnLoading = false
       })
     }
   },
@@ -310,7 +319,7 @@ export default {
     position: relative;
   }
   .input-item input{
-    width: 80px;
+    width: 60px;
     padding: 0 10px 0 10px;
     line-height: 40px;
     box-sizing: border-box;
@@ -345,8 +354,11 @@ export default {
     text-align: center;
   }
   .input-item.input-item-icon input{
-    width: 110px;
+    width: 100px;
     padding-right: 25px;
+  }
+  .input-item.input-item-rule input{
+    width: 120px;
   }
   .input-item.input-item-icon>i{
     position: absolute;

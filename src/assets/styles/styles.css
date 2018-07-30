@@ -19,10 +19,10 @@ body{
   height: 100%;
 }
 .page.page-search{
-  min-width: 1200px;
+  min-width: 1250px;
 }
 .page-search .main{
-  max-width: 1200px;
+  max-width: 1250px;
   margin: 30px auto;
 }
 .form-wrapper{

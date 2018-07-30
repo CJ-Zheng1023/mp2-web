@@ -13,10 +13,11 @@ function _addFormProperties (list) {
     item['city'] = ''
     item['area'] = ''
     item['town'] = ''
+    item['rule'] = ''
     item['status'] = prov ? 1 : 0
     item['url'] = `http://api.map.baidu.com/geocoder?address=${item['address']}&output=html&src=mp2`
     item['popoverContent'] = ''
-    item['popoverTitle'] = '加载中...'
+    item['popoverTitle'] = '邮编'
   })
 }
 export default {
@@ -59,14 +60,16 @@ export default {
         })
       })
     },
-    saveMark (context, marks) {
+    saveMark (context, {marks, rules}) {
       return new Promise((resolve, reject) => {
         axios.post(MODULE_CONTEXT + `/save?token=${window.localStorage.getItem('token')}`, {
-          markAddressList: JSON.stringify(marks)
+          markAddressList: JSON.stringify(marks),
+          addressRuleList: JSON.stringify(rules)
         }).then(response => {
           resolve(response.data)
         }).catch(e => {
           console.log(e)
+          reject(e)
         })
       })
     },
