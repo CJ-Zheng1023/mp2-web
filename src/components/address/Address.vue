@@ -16,17 +16,19 @@
             </el-form>
           </div>
           <div class="table">
-            <el-table :data="addressMarkList" border style="width: 100%">
+            <el-table :data="addressMarkList" border style="width: 100%" @selection-change="handleSelectionChange" ref="multipleTable">
+              <el-table-column type="selection" width="35">
+              </el-table-column>
               <el-table-column prop="an" label="申请号" width="160">
               </el-table-column>
               <el-table-column prop="appName" label="申请人" width="160">
               </el-table-column>
-              <el-table-column label="地址" width="290">
+              <el-table-column label="地址" width="280">
                 <template slot-scope="scope">
                   <a target="_blank" :href="scope.row.url">{{scope.row.address}}</a>
                 </template>
               </el-table-column>
-              <el-table-column label="邮编" width="80">
+              <el-table-column label="邮编" width="75">
                 <template slot-scope="scope">
                   <el-popover
                     placement="top"
@@ -37,7 +39,7 @@
                   </el-popover>
                 </template>
               </el-table-column>
-              <el-table-column label="标引数据" width="330">
+              <el-table-column label="标引数据" width="320">
                 <template slot-scope="scope">
                   <div class="input-item input-item-icon">
                     <input v-model="scope.row.province" @blur="checkProvince(scope.row, $event)" placeholder="省/直辖市"/>
@@ -114,7 +116,8 @@ export default {
         town: '',
         status: 0,
         marked: ''
-      }
+      },
+      multipleSelection: []
     }
   },
   computed: {
@@ -134,6 +137,9 @@ export default {
     }
   },
   methods: {
+    handleSelectionChange (val) {
+      this.multipleSelection = val
+    },
     _checkMarked (data) {
       if (data['province'] && data['city']) {
         data['marked'] = '1'
@@ -226,7 +232,7 @@ export default {
     batch () {
       let mark = this.mark
       this._checkMarked(mark)
-      this.addressMarkList.forEach(item => {
+      this.multipleSelection.forEach(item => {
         item['province'] = mark['province']
         item['city'] = mark['city']
         item['area'] = mark['area']
@@ -247,7 +253,8 @@ export default {
           city: item['city'],
           area: item['area'],
           town: item['town'],
-          status: item['status']
+          status: item['status'],
+          address: item['address']
         })
         let rule = item['rule']
         let province = item['province']
