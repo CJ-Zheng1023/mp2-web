@@ -51,7 +51,7 @@ export default {
     },
     search ({commit}, keyword) {
       return new Promise((resolve, reject) => {
-        axios.get(MODULE_CONTEXT + `/search/random?token=${window.localStorage.getItem('token')}&keyword=${keyword}`).then(response => {
+        axios.get(MODULE_CONTEXT + `/search/random?token=${window.localStorage.getItem('token')}&keyword=${keyword.trim()}`).then(response => {
           commit('search', response.data)
           resolve()
         }).catch(e => {

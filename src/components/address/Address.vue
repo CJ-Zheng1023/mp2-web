@@ -249,10 +249,10 @@ export default {
         marks.push({
           id: item['id'],
           marked: (item['province'] && item['city']) ? '1' : '',
-          province: item['province'],
-          city: item['city'],
-          area: item['area'],
-          town: item['town'],
+          province: item['province'].trim(),
+          city: item['city'].trim(),
+          area: item['area'].trim(),
+          town: item['town'].trim(),
           status: item['status'],
           address: item['address']
         })
@@ -261,9 +261,9 @@ export default {
         let city = item['city']
         if (rule && province && city) {
           rules.push({
-            province: province,
-            city: city,
-            area: item['area'],
+            province: province.trim(),
+            city: city.trim(),
+            area: item['area'].trim(),
             rule: item['rule']
           })
         }
