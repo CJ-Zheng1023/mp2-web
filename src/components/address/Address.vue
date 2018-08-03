@@ -41,19 +41,21 @@
               </el-table-column>
               <el-table-column label="标引数据" width="320">
                 <template slot-scope="scope">
-                  <div class="input-item input-item-icon">
-                    <input v-model="scope.row.province" @blur="checkProvince(scope.row, $event)" placeholder="省/直辖市"/>
-                    <i v-if="scope.row.status === 1" class="fa fa-check success"></i>
-                    <i v-else-if="scope.row.status === 2" class="fa fa-exclamation warning"></i>
-                  </div>
-                  <div class="input-item">
-                    <input v-model="scope.row.city" placeholder="市" />
-                  </div>
-                  <div class="input-item">
-                    <input v-model="scope.row.area" placeholder="区/县"/>
-                  </div>
-                  <div class="input-item">
-                    <input v-model="scope.row.town" placeholder="镇"/>
+                  <div class="input-wrapper" :class="{active: scope.row.active}">
+                    <div class="input-item input-item-icon">
+                      <input @focus="focus(scope.row)" @input="input(scope.row, 'province', $event)" :value="scope.row.province" @blur="checkProvince(scope.row, $event)" placeholder="省/直辖市"/>
+                      <i v-if="scope.row.status === 1" class="fa fa-check success"></i>
+                      <i v-else-if="scope.row.status === 2" class="fa fa-exclamation warning"></i>
+                    </div>
+                    <div class="input-item">
+                      <input @focus="focus(scope.row)" @input="input(scope.row, 'city', $event)" :value="scope.row.city" placeholder="市" />
+                    </div>
+                    <div class="input-item">
+                      <input @focus="focus(scope.row)" @input="input(scope.row, 'area', $event)" :value="scope.row.area" placeholder="区/县"/>
+                    </div>
+                    <div class="input-item">
+                      <input @focus="focus(scope.row)" @input="input(scope.row, 'town', $event)" :value="scope.row.town" placeholder="镇"/>
+                    </div>
                   </div>
                 </template>
               </el-table-column>
@@ -114,8 +116,7 @@ export default {
         city: '',
         area: '',
         town: '',
-        status: 0,
-        marked: ''
+        status: 0
       },
       multipleSelection: []
     }
@@ -143,15 +144,31 @@ export default {
     _checkMarked (data) {
       if (data['province'] && data['city']) {
         data['marked'] = '1'
-      } else if (!data['province'] && !data['city']) {
-        data['marked'] = ''
       } else {
-        data['marked'] = '2'
+        data['marked'] = ''
       }
+    },
+    focus (row) {
+      row['active'] = true
+      this.addressMarkList.forEach(item => {
+        if (row['appName'] === item['appName'] && row['address'] === item['address']) {
+          item['active'] = true
+        } else {
+          item['active'] = false
+        }
+      })
+    },
+    _setSameData (row, key) {
+      this.addressMarkList.forEach(item => {
+        if (row['appName'] === item['appName'] && row['address'] === item['address']) {
+          item[key] = row[key]
+        }
+      })
     },
     input (row, key, event) {
       row[key] = event.target.value
-      this._checkMarked(row)
+      this._setSameData(row, key)
+      // this._checkMarked(row)
     },
     mouseoverZip (row) {
       if (row.popoverContent) {
@@ -186,11 +203,17 @@ export default {
         city: '',
         area: '',
         town: '',
-        status: 0,
-        marked: ''
+        status: 0
       }
     },
     openDialog () {
+      if (this.multipleSelection.length === 0) {
+        this.$alert('请选择需要批量标引的数据', '提示', {
+          confirmButtonText: '确定',
+          type: 'warning'
+        })
+        return
+      }
       this.dialogVisible = true
     },
     closeDialog () {
@@ -202,6 +225,7 @@ export default {
       let value = target.value
       if (!value) {
         data.status = 0
+        this._setSameData(data, 'status')
         return
       }
       if (province.check(value)) {
@@ -209,6 +233,7 @@ export default {
       } else {
         data.status = 2
       }
+      this._setSameData(data, 'status')
     },
     ...mapActions('addressModule', [
       'showMarking',
@@ -231,30 +256,42 @@ export default {
     },
     batch () {
       let mark = this.mark
-      this._checkMarked(mark)
+      // this._checkMarked(mark)
       this.multipleSelection.forEach(item => {
         item['province'] = mark['province']
         item['city'] = mark['city']
         item['area'] = mark['area']
         item['town'] = mark['town']
         item['status'] = mark['status']
-        item['marked'] = mark['marked']
       })
       this.dialogVisible = false
+    },
+    _distinct (map, item) {
+      if ((!item['province'] || !item['city']) && !item['marked']) {
+        return
+      }
+      if (!item['marked']) {
+        item['marked'] = '1'
+      }
+      let key = `${item['appName']}:${item['address']}`
+      if (!map[key]) {
+        map[key] = item
+      }
     },
     save () {
       let marks = []
       let rules = []
+      let map = {}
       this.addressMarkList.forEach(item => {
-        marks.push({
-          id: item['id'],
-          marked: (item['province'] && item['city']) ? '1' : '',
+        this._distinct(map, {
+          marked: item['marked'],
           province: item['province'].trim(),
           city: item['city'].trim(),
           area: item['area'].trim(),
           town: item['town'].trim(),
           status: item['status'],
-          address: item['address']
+          address: item['address'],
+          appName: item['appName']
         })
         let rule = item['rule']
         let province = item['province']
@@ -268,6 +305,9 @@ export default {
           })
         }
       })
+      for (let k in map) {
+        marks.push(map[k])
+      }
       this.saveBtnLoading = true
       this.saveMark({marks, rules}).then(data => {
         if (data.flag) {
@@ -287,7 +327,12 @@ export default {
           })
         }
       }).catch(e => {
-        this.saveBtnLoading = false
+        this.$alert('添加失败', '提示', {
+          confirmButtonText: '确定',
+          type: 'error'
+        }).then(action => {
+          this.saveBtnLoading = false
+        })
       })
     }
   },
@@ -320,6 +365,9 @@ export default {
   }
   .search .el-input{
     width: 300px;
+  }
+  .input-wrapper.active .input-item input{
+    border-color: #66b1ff;
   }
   .input-item{
     display: inline-block;

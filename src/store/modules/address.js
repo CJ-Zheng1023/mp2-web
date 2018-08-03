@@ -18,6 +18,7 @@ function _addFormProperties (list) {
     item['url'] = `http://api.map.baidu.com/geocoder?address=${item['address']}&output=html&src=mp2`
     item['popoverContent'] = ''
     item['popoverTitle'] = '邮编'
+    item['active'] = false
   })
 }
 export default {
