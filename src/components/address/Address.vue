@@ -17,13 +17,13 @@
           </div>
           <div class="table">
             <el-table :data="addressMarkList" border style="width: 100%" @selection-change="handleSelectionChange" ref="multipleTable">
-              <el-table-column type="selection" width="35">
+              <el-table-column type="selection" width="45">
               </el-table-column>
-              <el-table-column prop="an" label="申请号" width="160">
+              <el-table-column prop="an" label="申请号" width="130">
               </el-table-column>
-              <el-table-column prop="appName" label="申请人" width="160">
+              <el-table-column prop="appName" label="申请人" width="140">
               </el-table-column>
-              <el-table-column label="地址" width="280">
+              <el-table-column label="地址" width="240">
                 <template slot-scope="scope">
                   <a target="_blank" :href="scope.row.url">{{scope.row.address}}</a>
                 </template>
@@ -43,26 +43,33 @@
                 <template slot-scope="scope">
                   <div class="input-wrapper" :class="{active: scope.row.active}">
                     <div class="input-item input-item-icon">
-                      <input @focus="focus(scope.row)" @input="input(scope.row, 'province', $event)" :value="scope.row.province" @blur="checkProvince(scope.row, $event)" placeholder="省/直辖市"/>
+                      <input @focus="focus(scope.row)" :title="scope.row.province" :disabled="!scope.row.enabled || scope.row.hasRule" @input="input(scope.row, 'province', $event)" :value="scope.row.province" @blur="checkProvince(scope.row, $event)" placeholder="省/直辖市"/>
                       <i v-if="scope.row.status === 1" class="fa fa-check success"></i>
                       <i v-else-if="scope.row.status === 2" class="fa fa-exclamation warning"></i>
                     </div>
                     <div class="input-item">
-                      <input @focus="focus(scope.row)" @input="input(scope.row, 'city', $event)" :value="scope.row.city" placeholder="市" />
+                      <input @focus="focus(scope.row)" :title="scope.row.city" :disabled="!scope.row.enabled || scope.row.hasRule" @input="input(scope.row, 'city', $event)" :value="scope.row.city" placeholder="市" />
                     </div>
                     <div class="input-item">
-                      <input @focus="focus(scope.row)" @input="input(scope.row, 'area', $event)" :value="scope.row.area" placeholder="区/县"/>
+                      <input @focus="focus(scope.row)" :title="scope.row.area" :disabled="!scope.row.enabled || scope.row.hasRule" @input="input(scope.row, 'area', $event)" :value="scope.row.area" placeholder="区/县"/>
                     </div>
                     <div class="input-item">
-                      <input @focus="focus(scope.row)" @input="input(scope.row, 'town', $event)" :value="scope.row.town" placeholder="镇"/>
+                      <input @focus="focus(scope.row)" :title="scope.row.town" :disabled="!scope.row.enabled || scope.row.hasRule" @input="input(scope.row, 'town', $event)" :value="scope.row.town" placeholder="镇"/>
                     </div>
                   </div>
                 </template>
               </el-table-column>
-              <el-table-column label="标引规则">
+              <el-table-column label="标引规则" width="140">
                 <template slot-scope="scope">
                   <div class="input-item input-item-rule">
-                    <input v-model="scope.row.rule" placeholder="标引规则"/>
+                    <input :title="scope.row.rule" :disabled="!scope.row.enabled || scope.row.hasRule" v-model="scope.row.rule" placeholder="标引规则"/>
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column label="标引开关">
+                <template slot-scope="scope">
+                  <div class="switch-wrapper" @click="clickSwitch(scope.row)">
+                    <el-switch :disabled="scope.row.hasRule" v-model="scope.row.enabled"></el-switch>
                   </div>
                 </template>
               </el-table-column>
@@ -101,7 +108,7 @@
 <script>
 import SearchHeader from '../SearchHeader'
 import province from '../../assets/scripts/province'
-import {mapState, mapActions} from 'vuex'
+import {mapState, mapActions, mapGetters} from 'vuex'
 export default {
   data () {
     return {
@@ -123,13 +130,17 @@ export default {
   },
   computed: {
     ...mapState('addressModule', [
-      'addressMarkList'
+      'addressMarkList',
+      'addressRuleList'
+    ]),
+    ...mapGetters('addressModule', [
+      'ruleRegExp'
     ]),
     saved () {
       let flag = true
       for (let i = 0, len = this.addressMarkList.length; i < len; i++) {
         let item = this.addressMarkList[i]
-        if (item['province'] && item['city']) {
+        if ((item['province'] && item['city']) || item['marked']) {
           flag = false
           break
         }
@@ -138,6 +149,14 @@ export default {
     }
   },
   methods: {
+    clickSwitch (data) {
+      if (data['enabled']) {
+        data['marked'] = ''
+      } else {
+        data['marked'] = '4'
+      }
+      this._setSameData(data, ['enabled', 'marked'])
+    },
     handleSelectionChange (val) {
       this.multipleSelection = val
     },
@@ -150,18 +169,22 @@ export default {
     },
     focus (row) {
       row['active'] = true
-      this.addressMarkList.forEach(item => {
-        if (row['appName'] === item['appName'] && row['address'] === item['address']) {
-          item['active'] = true
-        } else {
-          item['active'] = false
-        }
-      })
+      this._setSameData(row, 'active', false)
     },
-    _setSameData (row, key) {
+    _setSameData (row, keys, wrong) {
       this.addressMarkList.forEach(item => {
         if (row['appName'] === item['appName'] && row['address'] === item['address']) {
-          item[key] = row[key]
+          if (Array.isArray(keys)) {
+            for (let k of keys) {
+              item[k] = row[k]
+            }
+          } else {
+            item[keys] = row[keys]
+          }
+        } else {
+          if (wrong !== undefined) {
+            item[keys] = wrong
+          }
         }
       })
     },
@@ -236,14 +259,35 @@ export default {
       this._setSameData(data, 'status')
     },
     ...mapActions('addressModule', [
-      'showMarking',
+      'showMarkingAndRule',
       'search',
       'saveMark',
       'showAddressByZip'
     ]),
+    _markByRule () {
+      this.addressMarkList.forEach(item => {
+        let g = this.ruleRegExp.exec(item['address'])
+        if (g) {
+          let addr = g[0]
+          for (let i = 0, len = this.addressRuleList.length; i < len; i++) {
+            let addressRule = this.addressRuleList[i]
+            if (addr === addressRule['rule']) {
+              item['province'] = addressRule['province']
+              item['city'] = addressRule['city']
+              item['area'] = addressRule['area']
+              item['rule'] = addressRule['rule']
+              item['marked'] = '5'
+              item['hasRule'] = true
+              break
+            }
+          }
+        }
+      })
+    },
     random () {
       this.pageLoading = true
       this.search(this.formSearch.keyword).then(() => {
+        this._markByRule()
         this.pageLoading = false
       }).catch(e => {
         this.$alert('查询超时', '提示', {
@@ -258,11 +302,13 @@ export default {
       let mark = this.mark
       // this._checkMarked(mark)
       this.multipleSelection.forEach(item => {
-        item['province'] = mark['province']
-        item['city'] = mark['city']
-        item['area'] = mark['area']
-        item['town'] = mark['town']
-        item['status'] = mark['status']
+        if (!item['marked']) {
+          item['province'] = mark['province']
+          item['city'] = mark['city']
+          item['area'] = mark['area']
+          item['town'] = mark['town']
+          item['status'] = mark['status']
+        }
       })
       this.dialogVisible = false
     },
@@ -273,7 +319,12 @@ export default {
       if (!item['marked']) {
         item['marked'] = '1'
       }
-      let key = `${item['appName']}:${item['address']}`
+      let key
+      if (item['marked'] === '5') {
+        key = item['id']
+      } else {
+        key = `${item['appName']}:${item['address']}`
+      }
       if (!map[key]) {
         map[key] = item
       }
@@ -284,6 +335,7 @@ export default {
       let map = {}
       this.addressMarkList.forEach(item => {
         this._distinct(map, {
+          id: item['id'],
           marked: item['marked'],
           province: item['province'].trim(),
           city: item['city'].trim(),
@@ -296,12 +348,13 @@ export default {
         let rule = item['rule']
         let province = item['province']
         let city = item['city']
-        if (rule && province && city) {
+        if (item['marked'] === '' && rule && province && city) {
           rules.push({
             province: province.trim(),
             city: city.trim(),
             area: item['area'].trim(),
-            rule: item['rule']
+            rule: item['rule'].trim(),
+            address: item['address'].trim()
           })
         }
       })
@@ -341,7 +394,8 @@ export default {
   },
   created () {
     this.pageLoading = true
-    this.showMarking().then(() => {
+    this.showMarkingAndRule().then(() => {
+      this._markByRule()
       this.pageLoading = false
     }).catch(e => {
       this.$alert('查询超时', '提示', {
@@ -413,7 +467,7 @@ export default {
     padding-right: 25px;
   }
   .input-item.input-item-rule input{
-    width: 120px;
+    width: 110px;
   }
   .input-item.input-item-icon>i{
     position: absolute;

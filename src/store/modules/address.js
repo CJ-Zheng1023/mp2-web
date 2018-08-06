@@ -19,13 +19,25 @@ function _addFormProperties (list) {
     item['popoverContent'] = ''
     item['popoverTitle'] = '邮编'
     item['active'] = false
+    item['enabled'] = true
+    item['hasRule'] = false
   })
 }
 export default {
   namespaced: true,
   state () {
     return {
-      addressMarkList: []
+      addressMarkList: [],
+      addressRuleList: []
+    }
+  },
+  getters: {
+    ruleRegExp: state => {
+      let s = ''
+      state.addressRuleList.forEach(item => {
+        s = `${s}|${item.rule.trim()}`
+      })
+      return new RegExp(s.substring(1).replace(/\(/g, '\\(').replace(/\)/g, '\\)'))
     }
   },
   mutations: {
@@ -36,15 +48,22 @@ export default {
     search (state, data) {
       _addFormProperties(data.addressMarkList)
       state.addressMarkList = data.addressMarkList || []
+    },
+    queryRule (state, data) {
+      state.addressRuleList = data.addressRuleList || []
     }
   },
   actions: {
-    showMarking ({commit}) {
+    showMarkingAndRule ({commit}) {
       return new Promise((resolve, reject) => {
-        axios.get(MODULE_CONTEXT + `/search/marking?token=${window.localStorage.getItem('token')}`).then(response => {
-          commit('showMarking', response.data)
+        axios.all([
+          axios.get(MODULE_CONTEXT + `/search/marking?token=${window.localStorage.getItem('token')}`),
+          axios.get(MODULE_CONTEXT + `/rule/list?token=${window.localStorage.getItem('token')}`)
+        ]).then(axios.spread((markingResponse, ruleResponse) => {
+          commit('showMarking', markingResponse.data)
+          commit('queryRule', ruleResponse.data)
           resolve()
-        }).catch(e => {
+        })).catch(e => {
           console.log(e)
           reject(e)
         })
@@ -52,10 +71,14 @@ export default {
     },
     search ({commit}, keyword) {
       return new Promise((resolve, reject) => {
-        axios.get(MODULE_CONTEXT + `/search/random?token=${window.localStorage.getItem('token')}&keyword=${keyword.trim()}`).then(response => {
-          commit('search', response.data)
+        axios.all([
+          axios.get(MODULE_CONTEXT + `/search/random?token=${window.localStorage.getItem('token')}&keyword=${keyword.trim()}`),
+          axios.get(MODULE_CONTEXT + `/rule/list?token=${window.localStorage.getItem('token')}`)
+        ]).then(axios.spread((searchResponse, ruleResponse) => {
+          commit('search', searchResponse.data)
+          commit('queryRule', ruleResponse.data)
           resolve()
-        }).catch(e => {
+        })).catch(e => {
           console.log(e)
           reject(e)
         })
@@ -86,6 +109,17 @@ export default {
           }
         }).then(response => {
           resolve(response.data)
+        }).catch(e => {
+          console.log(e)
+          reject(e)
+        })
+      })
+    },
+    queryRule ({commit}) {
+      return new Promise((resolve, reject) => {
+        axios.get(MODULE_CONTEXT + `/rule/list?token=${window.localStorage.getItem('token')}`).then(response => {
+          commit('queryRule', response.data)
+          resolve()
         }).catch(e => {
           console.log(e)
           reject(e)
