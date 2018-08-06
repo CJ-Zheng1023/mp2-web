@@ -63,3 +63,7 @@ body{
   cursor: pointer;
   margin-left: 10px;
 }
+.table-expand label {
+  width: 90px;
+  color: #99a9bf;
+}

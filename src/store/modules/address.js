@@ -28,7 +28,9 @@ export default {
   state () {
     return {
       addressMarkList: [],
-      addressRuleList: []
+      addressRuleList: [],
+      addressRuleListByPage: [],
+      pagination: {}
     }
   },
   getters: {
@@ -51,6 +53,10 @@ export default {
     },
     queryRule (state, data) {
       state.addressRuleList = data.addressRuleList || []
+    },
+    queryRuleByPage (state, data) {
+      state.addressRuleListByPage = data.addressRuleList || []
+      state.pagination = data.pagination
     }
   },
   actions: {
@@ -119,6 +125,17 @@ export default {
       return new Promise((resolve, reject) => {
         axios.get(MODULE_CONTEXT + `/rule/list?token=${window.localStorage.getItem('token')}`).then(response => {
           commit('queryRule', response.data)
+          resolve()
+        }).catch(e => {
+          console.log(e)
+          reject(e)
+        })
+      })
+    },
+    queryRuleByPage ({commit}, {keyword, type, pageNumber, size}) {
+      return new Promise((resolve, reject) => {
+        axios.get(MODULE_CONTEXT + `/rule/list/page?token=${window.localStorage.getItem('token')}&type=${type}&keyword=${keyword}&pageNumber=${pageNumber}&size=${size}`).then(response => {
+          commit('queryRuleByPage', response.data)
           resolve()
         }).catch(e => {
           console.log(e)

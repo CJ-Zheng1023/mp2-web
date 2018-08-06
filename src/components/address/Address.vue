@@ -101,12 +101,14 @@
             <el-button type="primary" @click="batch">确定</el-button>
           </div>
         </el-dialog>
+        <rule :dialogVisible="ruleDialogVisible" @close="ruleDialogClose"></rule>
       </div>
     </div>
   </div>
 </template>
 <script>
 import SearchHeader from '../SearchHeader'
+import Rule from './Rule'
 import province from '../../assets/scripts/province'
 import {mapState, mapActions, mapGetters} from 'vuex'
 export default {
@@ -125,7 +127,8 @@ export default {
         town: '',
         status: 0
       },
-      multipleSelection: []
+      multipleSelection: [],
+      ruleDialogVisible: false
     }
   },
   computed: {
@@ -149,6 +152,9 @@ export default {
     }
   },
   methods: {
+    ruleDialogClose () {
+      this.ruleDialogVisible = false
+    },
     ruleHeader (h) {
       return h('span', [
         h('span', '标引规则'),
@@ -398,12 +404,13 @@ export default {
     }
   },
   components: {
-    SearchHeader
+    SearchHeader,
+    Rule
   },
   mounted () {
     this.$nextTick(() => {
       document.querySelector('.search-rule-btn').addEventListener('click', e => {
-        console.log(123)
+        this.ruleDialogVisible = true
       })
     })
   },
