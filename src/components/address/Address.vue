@@ -59,7 +59,7 @@
                   </div>
                 </template>
               </el-table-column>
-              <el-table-column label="标引规则" width="140">
+              <el-table-column :render-header="ruleHeader" width="140">
                 <template slot-scope="scope">
                   <div class="input-item input-item-rule">
                     <input :title="scope.row.rule" :disabled="!scope.row.enabled || scope.row.hasRule" v-model="scope.row.rule" placeholder="标引规则"/>
@@ -149,6 +149,14 @@ export default {
     }
   },
   methods: {
+    ruleHeader (h) {
+      return h('span', [
+        h('span', '标引规则'),
+        h('i', {
+          'class': 'fa fa-search search-rule-btn'
+        })
+      ])
+    },
     clickSwitch (data) {
       if (data['enabled']) {
         data['marked'] = ''
@@ -392,6 +400,13 @@ export default {
   components: {
     SearchHeader
   },
+  mounted () {
+    this.$nextTick(() => {
+      document.querySelector('.search-rule-btn').addEventListener('click', e => {
+        console.log(123)
+      })
+    })
+  },
   created () {
     this.pageLoading = true
     this.showMarkingAndRule().then(() => {
@@ -491,5 +506,8 @@ export default {
   .zip-content{
     text-decoration: none;
     color: #606266;
+  }
+  .search-rule{
+    cursor: pointer;
   }
 </style>
