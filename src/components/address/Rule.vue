@@ -55,7 +55,7 @@
             layout="prev, pager, next"
             :total="pagination.total"
             :page-size="pagination.size"
-            :current-page.sync="pagination.pageNumber + 1">
+            :current-page="pageNumber">
           </el-pagination>
         </div>
       </div>
@@ -113,9 +113,6 @@ export default {
       this.$emit('close')
     },
     onSubmit () {
-      console.log(123)
-    },
-    openDialog () {
       this.pageLoading = true
       this.queryRuleByPage({
         keyword: this.ruleForm.keyword,
@@ -125,6 +122,9 @@ export default {
       }).then(() => {
         this.pageLoading = false
       })
+    },
+    openDialog () {
+      this.onSubmit()
     }
   }
 }
