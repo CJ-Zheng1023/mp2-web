@@ -20,7 +20,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="updateDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="handleUpdate('updateForm')">确 定</el-button>
+        <el-button type="primary" @click="handleUpdate('updateForm')" :loading="updateBtnLoading">确 定</el-button>
       </span>
     </el-dialog>
     <el-form :inline="true" :model="ruleForm" class="rule-form">
@@ -123,7 +123,8 @@ export default {
       size: 10,
       pageLoading: false,
       curUserId: window.localStorage.getItem('userId'),
-      updateDialogVisible: false
+      updateDialogVisible: false,
+      updateBtnLoading: false
     }
   },
   computed: {
@@ -146,16 +147,20 @@ export default {
     handleUpdate (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          this.updateBtnLoading = true
           this.updateAddressRule(this.addressRule).then(data => {
+            this.updateBtnLoading = false
             if (data.flag) {
               this.$alert('修改成功', '提示', {
                 confirmButtonText: '确定',
                 type: 'success'
               }).then(action => {
                 this.onSubmit()
+                this.$emit('refresh-rule')
                 this.updateDialogVisible = false
               })
             } else {
+              this.updateBtnLoading = false
               this.$alert('修改失败', '提示', {
                 confirmButtonText: '确定',
                 type: 'error'

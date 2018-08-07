@@ -101,7 +101,7 @@
             <el-button type="primary" @click="batch">确定</el-button>
           </div>
         </el-dialog>
-        <rule :dialogVisible="ruleDialogVisible" @close="ruleDialogClose"></rule>
+        <rule @refresh-rule="refreshRule" :dialogVisible="ruleDialogVisible" @close="ruleDialogClose"></rule>
       </div>
     </div>
   </div>
@@ -152,6 +152,13 @@ export default {
     }
   },
   methods: {
+    refreshRule () {
+      this.pageLoading = true
+      this.queryRule().then(() => {
+        this._markByRule()
+        this.pageLoading = false
+      })
+    },
     ruleDialogClose () {
       this.ruleDialogVisible = false
     },
@@ -276,7 +283,8 @@ export default {
       'showMarkingAndRule',
       'search',
       'saveMark',
-      'showAddressByZip'
+      'showAddressByZip',
+      'queryRule'
     ]),
     _markByRule () {
       this.addressMarkList.forEach(item => {
