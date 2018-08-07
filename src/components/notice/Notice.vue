@@ -9,7 +9,7 @@
           <div class="figure">
             <img src="../../assets/images/1.gif" />
             <div class="figcaption">
-              说明:当遇到无法标引的数据时可以使用该功能，当关闭标引后输入框会被禁用。关闭标引后点击保存标引按钮即可提交数据。（关闭标引后在系统里无法查看该条数据，并且跟该条数据地址和申请人字段相同的数据也无法查看）
+              说明:当遇到无法标引的数据时可以使用该功能，当关闭标引后输入框会被禁用。关闭标引后点击保存标引按钮即可提交数据。（关闭标引提交后在系统里无法查看该条数据，并且跟该条数据地址和申请人字段相同的数据也无法查看）
             </div>
           </div>
           <h2>2.批量操作地址和申请人相同的数据</h2>
@@ -30,7 +30,7 @@
           <div class="figure">
             <img src="../../assets/images/4.gif" />
             <div class="figcaption">
-              说明:点击表格标引规则列的放大镜按钮即可查询标引规则，可以根据标引规则和查看范围等查询条件查询相应的标引规则信息。点击箭头图标可以查看详细的标引规则信息。
+              说明:点击表格标引规则列的放大镜图标即可查询标引规则，可以根据标引规则和查看范围等查询条件查询相应的标引规则信息。点击箭头图标可以查看详细的标引规则信息。
             </div>
           </div>
           <h2>5.修改标引规则</h2>
@@ -61,6 +61,17 @@ export default {
   }
   h1{
     text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+    color: #909399;
+    margin-bottom: 70px;
+  }
+  h2{
+    padding-left: 30px;
+    margin-bottom: 40px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #909399;
   }
   .figure{
     text-align: center;
@@ -73,5 +84,8 @@ export default {
     margin: 0 auto;
     padding: 30px 0;
     text-align: left;
+    font-size: 16px;
+    color: #606266;
+    line-height: 30px;
   }
 </style>
