@@ -21,6 +21,7 @@ function _addFormProperties (list) {
     item['active'] = false
     item['enabled'] = true
     item['hasRule'] = false
+    item['ruleUser'] = ''
   })
 }
 export default {

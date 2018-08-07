@@ -57,6 +57,14 @@ let router = new Router({
         title: '地址标引',
         requireAuth: true
       }
+    },
+    {
+      path: '/notice',
+      name: 'Notice',
+      component: () => import('../components/notice/Notice'),
+      meta: {
+        title: '更新公告'
+      }
     }
   ]
 })

@@ -13,6 +13,7 @@
         {{username}}<i class="el-icon-arrow-down el-icon--right"></i>
       </span>
         <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="notice">更新公告</el-dropdown-item>
           <el-dropdown-item>排行榜</el-dropdown-item>
           <el-dropdown-item command="logout">退出</el-dropdown-item>
         </el-dropdown-menu>
@@ -90,6 +91,8 @@ export default {
             })
           }
         })
+      } else if (command === 'notice') {
+        this.$router.push({path: `/notice`})
       }
     }
   }

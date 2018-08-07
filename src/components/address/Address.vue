@@ -61,7 +61,17 @@
               </el-table-column>
               <el-table-column :render-header="ruleHeader" width="140">
                 <template slot-scope="scope">
-                  <div class="input-item input-item-rule">
+                  <el-popover v-if="scope.row.marked === '5'"
+                    placement="top-start"
+                    :title="scope.row.ruleUser"
+                    width="200"
+                    trigger="hover"
+                    :content="scope.row.rule">
+                    <div class="input-item input-item-rule" slot="reference">
+                      <input :disabled="!scope.row.enabled || scope.row.hasRule" v-model="scope.row.rule" placeholder="标引规则"/>
+                    </div>
+                  </el-popover>
+                  <div v-else class="input-item input-item-rule" slot="reference">
                     <input :title="scope.row.rule" :disabled="!scope.row.enabled || scope.row.hasRule" v-model="scope.row.rule" placeholder="标引规则"/>
                   </div>
                 </template>
@@ -299,6 +309,7 @@ export default {
               item['area'] = addressRule['area']
               item['rule'] = addressRule['rule']
               item['marked'] = '5'
+              item['ruleUser'] = addressRule['user']['username']
               item['hasRule'] = true
               break
             }
@@ -367,15 +378,15 @@ export default {
           address: item['address'],
           appName: item['appName']
         })
-        let rule = item['rule']
-        let province = item['province']
-        let city = item['city']
+        let rule = item['rule'].trim()
+        let province = item['province'].trim()
+        let city = item['city'].trim()
         if (item['marked'] === '' && rule && province && city) {
           rules.push({
-            province: province.trim(),
-            city: city.trim(),
+            province: province,
+            city: city,
             area: item['area'].trim(),
-            rule: item['rule'].trim(),
+            rule: rule,
             address: item['address'].trim()
           })
         }
