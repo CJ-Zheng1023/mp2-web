@@ -16,47 +16,52 @@
       </el-form-item>
     </el-form>
     <div v-loading="pageLoading">
-      <el-table :data="addressRuleListByPage" style="width: 100%">
-        <el-table-column type="expand">
-          <template slot-scope="props">
-            <el-form label-position="left" inline class="table-expand">
-              <el-form-item label="地址" class="item-address">
-                <span>{{ props.row.address }}</span>
-              </el-form-item>
-              <el-form-item label="省">
-                <span>{{ props.row.province }}</span>
-              </el-form-item>
-              <el-form-item label="市">
-                <span>{{ props.row.city }}</span>
-              </el-form-item>
-              <el-form-item label="区">
-                <span>{{ props.row.area }}</span>
-              </el-form-item>
-            </el-form>
-          </template>
-        </el-table-column>
-        <el-table-column label="用户名" prop="userId">
-        </el-table-column>
-        <el-table-column label="标引规则" prop="rule">
-        </el-table-column>
-        <el-table-column label="操作">
-          <template slot-scope="scope">
-            <el-button
-              size="mini"
-              @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <div class="pagination-wrapper">
-        <el-pagination
-          background
-          @current-change="clickPagination"
-          layout="prev, pager, next"
-          :total="pagination.total"
-          :page-size="pagination.size"
-          :current-page.sync="pagination.pagenumber">
-        </el-pagination>
+      <div v-if="addressRuleListByPage.length !== 0">
+        <el-table :data="addressRuleListByPage" style="width: 100%">
+          <el-table-column type="expand">
+            <template slot-scope="props">
+              <el-form label-position="left" inline class="table-expand">
+                <el-form-item label="地址" class="item-address">
+                  <span>{{ props.row.address }}</span>
+                </el-form-item>
+                <el-form-item label="省">
+                  <span>{{ props.row.province }}</span>
+                </el-form-item>
+                <el-form-item label="市">
+                  <span>{{ props.row.city }}</span>
+                </el-form-item>
+                <el-form-item label="区">
+                  <span>{{ props.row.area }}</span>
+                </el-form-item>
+              </el-form>
+            </template>
+          </el-table-column>
+          <el-table-column label="用户名" prop="user.username">
+          </el-table-column>
+          <el-table-column label="标引规则" prop="rule">
+          </el-table-column>
+          <el-table-column label="操作">
+            <template slot-scope="scope">
+              <el-button v-if="curUserId === scope.row.userId"
+                size="mini"
+                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="pagination-wrapper">
+          <el-pagination
+            background
+            @current-change="clickPagination"
+            layout="prev, pager, next"
+            :total="pagination.total"
+            :page-size="pagination.size"
+            :current-page.sync="pagination.pageNumber + 1">
+          </el-pagination>
+        </div>
       </div>
+      <p v-else style="text-align: center;">
+        暂无数据
+      </p>
     </div>
   </el-dialog>
 </template>
@@ -73,14 +78,18 @@ export default {
         type: '1'
       },
       size: 10,
-      pageLoading: false
+      pageLoading: false,
+      curUserId: window.localStorage.getItem('userId')
     }
   },
   computed: {
     ...mapState('addressModule', [
       'addressRuleListByPage',
       'pagination'
-    ])
+    ]),
+    pageNumber () {
+      return this.pagination.pageNumber + 1
+    }
   },
   methods: {
     ...mapActions('addressModule', [
@@ -91,7 +100,7 @@ export default {
       this.queryRuleByPage({
         keyword: this.ruleForm.keyword,
         type: this.ruleForm.type,
-        pageNumber: curPage,
+        pageNumber: curPage - 1,
         size: this.size
       }).then(() => {
         this.pageLoading = false
@@ -107,14 +116,11 @@ export default {
       console.log(123)
     },
     openDialog () {
-      if (this.addressRuleListByPage.length !== 0) {
-        return
-      }
       this.pageLoading = true
       this.queryRuleByPage({
         keyword: this.ruleForm.keyword,
         type: this.ruleForm.type,
-        pageNumber: 1,
+        pageNumber: 0,
         size: this.size
       }).then(() => {
         this.pageLoading = false
