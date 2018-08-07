@@ -9,35 +9,35 @@
           <div class="figure">
             <img src="../../assets/images/1.gif" />
             <div class="figcaption">
-              说明:
+              说明:当遇到无法标引的数据时可以使用该功能，当关闭标引后输入框会被禁用。关闭标引后点击保存标引按钮即可提交数据。（关闭标引后在系统里无法查看该条数据，并且跟该条数据地址和申请人字段相同的数据也无法查看）
             </div>
           </div>
           <h2>2.批量操作地址和申请人相同的数据</h2>
           <div class="figure">
             <img src="../../assets/images/2.gif" />
             <div class="figcaption">
-              说明:
+              说明:当遇到地址和申请人字段同时相同的数据时，标引其中一条数据，与其地址和申请人字段相同的数据也会同步标引（关闭标引功能同理）。标引完成之后点击保存标引按钮即可提交数据。
             </div>
           </div>
           <h2>3.已有标引规则</h2>
           <div class="figure">
             <img src="../../assets/images/3.gif" />
             <div class="figcaption">
-              说明:
+              说明:当查询的地址字段可以匹配已提交的标引规则时，会把相应的标引规则的标引内容回填到输入框里，并且不可编辑。当鼠标悬浮到标引规则输入框时可以查看标引用户以及标引规则。点击保存标引按钮即可提交数据。
             </div>
           </div>
           <h2>4.标引规则查询</h2>
           <div class="figure">
             <img src="../../assets/images/4.gif" />
             <div class="figcaption">
-              说明:
+              说明:点击表格标引规则列的放大镜按钮即可查询标引规则，可以根据标引规则和查看范围等查询条件查询相应的标引规则信息。点击箭头图标可以查看详细的标引规则信息。
             </div>
           </div>
           <h2>5.修改标引规则</h2>
           <div class="figure">
             <img src="../../assets/images/5.gif" />
             <div class="figcaption">
-              说明:
+              说明:在标引规则查询窗口，点击编辑按钮即可修改相应的标引规则信息，修改完毕后点击确定即可提交修改数据。（只可修改自己的标引规则）
             </div>
           </div>
         </el-card>
