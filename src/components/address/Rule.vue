@@ -1,5 +1,28 @@
 <template>
   <el-dialog @open="openDialog" title="标引规则查询" :visible="dialogVisible" width="800px" :before-close="handleClose">
+    <el-dialog @close="closeUpdateDialog('updateForm')" width="450px" title="修改标引规则" :visible.sync="updateDialogVisible" append-to-body>
+      <el-form :model="addressRule" label-width="100px" ref="updateForm" :rules="rules">
+        <el-form-item label="标引地址">
+          <span>{{ addressRule.address }}</span>
+        </el-form-item>
+        <el-form-item label="标引规则" prop="rule">
+          <el-input v-model="addressRule.rule" placeholder="标引规则"></el-input>
+        </el-form-item>
+        <el-form-item label="省/直辖市" prop="province">
+          <el-input v-model="addressRule.province" placeholder="省/直辖市"></el-input>
+        </el-form-item>
+        <el-form-item label="市" prop="city">
+          <el-input v-model="addressRule.city" placeholder="市"></el-input>
+        </el-form-item>
+        <el-form-item label="区/县" prop="area">
+          <el-input v-model="addressRule.area" placeholder="区/县"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="updateDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="handleUpdate('updateForm')">确 定</el-button>
+      </span>
+    </el-dialog>
     <el-form :inline="true" :model="ruleForm" class="rule-form">
       <el-form-item label="标引规则">
         <el-input v-model="ruleForm.keyword" placeholder="标引规则"></el-input>
@@ -36,9 +59,9 @@
               </el-form>
             </template>
           </el-table-column>
-          <el-table-column label="用户名" prop="user.username">
+          <el-table-column label="用户名" prop="user.username" width="160">
           </el-table-column>
-          <el-table-column label="标引规则" prop="rule">
+          <el-table-column label="标引规则" prop="rule" width="400">
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
@@ -77,9 +100,30 @@ export default {
         keyword: '',
         type: '1'
       },
+      addressRule: {
+        rule: '',
+        province: '',
+        city: '',
+        area: ''
+      },
+      rules: {
+        rule: [
+          { required: true, message: '请输入标引规则', trigger: 'blur' }
+        ],
+        province: [
+          { required: true, message: '请输入省/直辖市', trigger: 'blur' }
+        ],
+        city: [
+          { required: true, message: '请输入市', trigger: 'blur' }
+        ],
+        area: [
+          { required: true, message: '请输入区/县', trigger: 'blur' }
+        ]
+      },
       size: 10,
       pageLoading: false,
-      curUserId: window.localStorage.getItem('userId')
+      curUserId: window.localStorage.getItem('userId'),
+      updateDialogVisible: false
     }
   },
   computed: {
@@ -93,8 +137,45 @@ export default {
   },
   methods: {
     ...mapActions('addressModule', [
-      'queryRuleByPage'
+      'queryRuleByPage',
+      'updateAddressRule'
     ]),
+    closeUpdateDialog (formName) {
+      this.$refs[formName].clearValidate()
+    },
+    handleUpdate (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.updateAddressRule(this.addressRule).then(data => {
+            if (data.flag) {
+              this.$alert('修改成功', '提示', {
+                confirmButtonText: '确定',
+                type: 'success'
+              }).then(action => {
+                this.onSubmit()
+                this.updateDialogVisible = false
+              })
+            } else {
+              this.$alert('修改失败', '提示', {
+                confirmButtonText: '确定',
+                type: 'error'
+              }).then(action => {
+                this.updateDialogVisible = false
+              })
+            }
+          }).catch(e => {
+            this.$alert('修改失败', '提示', {
+              confirmButtonText: '确定',
+              type: 'error'
+            }).then(action => {
+              this.updateDialogVisible = false
+            })
+          })
+        } else {
+          return false
+        }
+      })
+    },
     clickPagination (curPage) {
       this.pageLoading = true
       this.queryRuleByPage({
@@ -107,7 +188,15 @@ export default {
       })
     },
     handleEdit (index, row) {
-      console.log(row)
+      this.addressRule = {
+        id: row['id'],
+        province: row['province'],
+        city: row['city'],
+        area: row['area'],
+        address: row['address'],
+        rule: row['rule']
+      }
+      this.updateDialogVisible = true
     },
     handleClose (done) {
       this.$emit('close')

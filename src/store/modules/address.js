@@ -142,6 +142,19 @@ export default {
           reject(e)
         })
       })
+    },
+    updateAddressRule ({commit}, {id, province, city, area, rule}) {
+      let addressRule = {id, province, city, area, rule}
+      return new Promise((resolve, reject) => {
+        axios.post(MODULE_CONTEXT + `/rule/modify?token=${window.localStorage.getItem('token')}`, {
+          addressRule: JSON.stringify(addressRule)
+        }).then(response => {
+          resolve(response.data)
+        }).catch(e => {
+          console.log(e)
+          reject(e)
+        })
+      })
     }
   }
 }
