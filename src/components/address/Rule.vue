@@ -65,10 +65,16 @@
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button v-if="curUserId === scope.row.userId"
-                type="success"
-                size="mini"
-                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+              <div v-if="curUserId === scope.row.userId">
+                <el-button
+                  type="success"
+                  size="mini"
+                  @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                <el-button
+                  type="warning"
+                  size="mini"
+                  @click="handleDelete(scope.row.id)">删除</el-button>
+              </div>
             </template>
           </el-table-column>
         </el-table>
@@ -140,7 +146,8 @@ export default {
   methods: {
     ...mapActions('addressModule', [
       'queryRuleByPage',
-      'updateAddressRule'
+      'updateAddressRule',
+      'deleteAddressRule'
     ]),
     closeUpdateDialog (formName) {
       this.$refs[formName].clearValidate()
@@ -191,6 +198,38 @@ export default {
         size: this.size
       }).then(() => {
         this.pageLoading = false
+      })
+    },
+    handleDelete (id) {
+      this.$confirm('您确定要删除该标引词吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.deleteAddressRule(id).then(data => {
+          if (data.flag) {
+            this.$alert('删除成功', '提示', {
+              confirmButtonText: '确定',
+              type: 'success'
+            }).then(action => {
+              this.onSubmit()
+              this.$emit('refresh-rule')
+            })
+          } else {
+            this.$alert('删除失败', '提示', {
+              confirmButtonText: '确定',
+              type: 'error'
+            }).then(action => {
+            })
+          }
+        }).catch(e => {
+          this.$alert('删除失败', '提示', {
+            confirmButtonText: '确定',
+            type: 'error'
+          }).then(action => {
+          })
+        })
+      }).catch(() => {
       })
     },
     handleEdit (index, row) {

@@ -71,9 +71,11 @@
                       <input :disabled="!scope.row.enabled || scope.row.hasRule" v-model="scope.row.rule" placeholder="标引规则"/>
                     </div>
                   </el-popover>
-                  <div v-else class="input-item input-item-rule" slot="reference">
-                    <input :title="scope.row.rule" :disabled="!scope.row.enabled || scope.row.hasRule" v-model="scope.row.rule" placeholder="标引规则"/>
-                  </div>
+                  <template v-else>
+                    <div class="input-item input-item-rule">
+                      <input :title="scope.row.rule" :disabled="!scope.row.enabled || scope.row.hasRule" v-model="scope.row.rule" placeholder="标引规则"/>
+                    </div>
+                  </template>
                 </template>
               </el-table-column>
               <el-table-column label="标引开关">
@@ -313,6 +315,16 @@ export default {
               item['hasRule'] = true
               break
             }
+          }
+        } else {
+          if (item['hasRule']) {
+            item['province'] = ''
+            item['city'] = ''
+            item['area'] = ''
+            item['rule'] = ''
+            item['marked'] = ''
+            item['ruleUser'] = ''
+            item['hasRule'] = false
           }
         }
       })
