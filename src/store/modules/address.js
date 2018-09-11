@@ -156,6 +156,18 @@ export default {
           reject(e)
         })
       })
+    },
+    deleteAddressRule ({commit}, id) {
+      return new Promise((resolve, reject) => {
+        axios.post(MODULE_CONTEXT + `/rule/delete?token=${window.localStorage.getItem('token')}`, {
+          id: id
+        }).then(response => {
+          resolve(response.data)
+        }).catch(e => {
+          console.log(e)
+          reject(e)
+        })
+      })
     }
   }
 }
