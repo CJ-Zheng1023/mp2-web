@@ -42,7 +42,7 @@
               </div>
             </div>
             <div style="padding: 14px;">
-              <router-link to="/">
+              <router-link to="/compSearch">
                 <el-button type="text" class="button">关键词标引</el-button>
               </router-link>
             </div>

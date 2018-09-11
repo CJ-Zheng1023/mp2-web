@@ -65,6 +65,24 @@ let router = new Router({
       meta: {
         title: '更新公告'
       }
+    },
+    {
+      path: '/compSearch',
+      name: 'CompIpc',
+      component: () => import('../components/comp/Ipc'),
+      meta: {
+        title: 'IPC下案卷比对',
+        requireAuth: true
+      }
+    },
+    {
+      path: '/comp/ipc/search/:ipc',
+      name: 'CompResult',
+      component: () => import('../components/comp/Result'),
+      meta: {
+        title: 'IPC下案卷比对',
+        requireAuth: true
+      }
     }
   ]
 })
