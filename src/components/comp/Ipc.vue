@@ -63,6 +63,11 @@ export default {
 }
 </script>
 <style scoped>
+  .page {
+    background-image: url('../../assets/images/bg1.jpg')!important;
+    background-attachment: fixed;
+    background-size: cover;
+  }
   .ipc-container{
     padding: 15px;
     border-radius: 7px;

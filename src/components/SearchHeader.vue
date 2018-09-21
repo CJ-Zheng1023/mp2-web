@@ -35,7 +35,7 @@
             <a href="javascript:;" @click="toPage('/ipc')">IPC标引</a>
           </li>
           <li class="menu-item">
-            <a href="javascript:;" @click="toPage('/keyword')">关键词标引</a>
+            <a href="javascript:;" @click="toPage('/compSearch')">案卷比对</a>
           </li>
         </ul>
       </div>

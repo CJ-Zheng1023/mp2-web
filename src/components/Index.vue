@@ -43,7 +43,7 @@
             </div>
             <div style="padding: 14px;">
               <router-link to="/compSearch">
-                <el-button type="text" class="button">关键词标引</el-button>
+                <el-button type="text" class="button">案卷比对</el-button>
               </router-link>
             </div>
           </el-card>

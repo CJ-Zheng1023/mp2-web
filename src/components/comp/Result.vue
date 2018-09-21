@@ -14,18 +14,19 @@
       </div>
     </search-header>
     <div class="main">
-      <el-row :gutter="30">
-        <el-col :span="8" v-if="compIpcResult">
+      <el-row :gutter="8">
+        <el-col :span="8" v-if="compIpcResult.length !=0">
           <div class="an-list">
             <el-row :gutter="10">
               <el-table
                 :data="compIpcResult"
                 border
-                style="width: 100%" @row-click="openDetails" :row-class-name="tableRowClassName" :row-style="selectHighLight" :header-cell-style="{'background-color': '#5C5CD6','color': 'white'}">
-                <el-table-column prop="an" label="申请号" width="150" class="table-item"></el-table-column>
+                style="width: 100%;" @row-click="openDetails" :row-class-name="tableRowClassName" :row-style="selectHighLight" :header-cell-style="{'background-color': '#FFCA28','color': 'black','text-align':'center'}" >
+                <el-table-column prop="apoldAn" label="申请号" width="155" class="table-item"></el-table-column>
                 <el-table-column  label="对比文献">
                   <el-table-column prop="citedAn" label="申请号" width="150" class="table-item"></el-table-column>
-                  <el-table-column prop="citeType" label="类型" class="table-item"></el-table-column>
+                  <el-table-column prop="citeType" label="类型" width="53" class="table-item"></el-table-column>
+                  <el-table-column prop="location" label="排名" width="61" class="table-item"></el-table-column>
                 </el-table-column>
               </el-table>
             </el-row>
@@ -35,6 +36,7 @@
                   <el-pagination
                     @current-change="clickPagination"
                     background
+                    font-size="12px !important"
                     :current-page="currentPage"
                     layout="prev, pager, next"
                     :page-size="pagination.size"
@@ -50,7 +52,7 @@
             <p>空空如也~</p>
           </el-card>
         </el-col>
-        <el-col :span="16">
+        <el-col :span="16" v-if="compIpcResult.length !=0">
           <div class="patent-detail" v-loading="patentLoading">
             <el-row><el-button-group class="prev-next-btn"><el-button type="primary" plain  @click="prev" class="prev-patent" icon="el-icon-arrow-left">上一篇</el-button><el-button type="primary" plain  @click="next" class="next-patent">下一篇<i class="el-icon-arrow-right el-icon--right"></i></el-button></el-button-group></el-row>
             <div class="comp-main">
@@ -91,12 +93,16 @@
                             <div v-html="this.selfpatentBaseInfo.TI">
                             </div>
                           </el-collapse-item>
-                          <el-collapse-item title="说明书" name="2">
-                            <div v-html="this.selfpatentBaseInfo.DESC">
+                          <el-collapse-item title="摘要" name="4">
+                            <div v-html="this.selfpatentBaseInfo.AB">
                             </div>
                           </el-collapse-item>
-                          <el-collapse-item title="权力要求" name="3">
-                            <div v-html="selfCLMS"></div>
+                          <el-collapse-item title="说明书" name="2">
+                            <div v-html="selfpatentBaseInfo.DESC">
+                            </div>
+                          </el-collapse-item>
+                          <el-collapse-item title="权利要求" name="3">
+                            <div v-html="selfpatentBaseInfo.CLIMS"></div>
                           </el-collapse-item>
                         </el-collapse>
                       </div>
@@ -117,7 +123,7 @@
                           </div>
                           <div class="patent-item">
                             <label>分类号:</label>
-                            <div class="content" v-if="this.compIpcResult[this.index].cIpc">{{this.compIpcResult[this.index].cIpc}}</div>
+                            <div class="content">{{this.compIpcResult[this.index].cIpc}}</div>
                           </div>
                           <div class="patent-item">
                             <label>发明人:</label>
@@ -135,14 +141,18 @@
                       </div>
                       <div class="grid-content bg-purple-light">
                         <el-collapse v-model="activeNames" accordion>
-                          <el-collapse-item title="发明名称" name="1">
+                          <el-collapse-item title="发明名称" name="1" class="collapse-title">
                             <div v-html="this.citepatentBaseInfo.TI"></div>
+                          </el-collapse-item>
+                          <el-collapse-item title="摘要" name="4">
+                            <div v-html="this.citepatentBaseInfo.AB">
+                            </div>
                           </el-collapse-item>
                           <el-collapse-item title="说明书" name="2">
                             <div v-html="this.citepatentBaseInfo.DESC"></div>
                           </el-collapse-item>
-                          <el-collapse-item title="权力要求" name="3">
-                            <div v-html="citeCLMS"></div>
+                          <el-collapse-item title="权利要求" name="3">
+                            <div v-html="this.citepatentBaseInfo.CLIMS"></div>
                           </el-collapse-item>
                         </el-collapse>
                       </div>
@@ -157,6 +167,11 @@
               </el-row>
             </div>
           </div>
+        </el-col>
+        <el-col :span="16" v-else>
+          <el-card class="box-card">
+            <p>空空如也~</p>
+          </el-card>
         </el-col>
       </el-row>
     </div>
@@ -202,25 +217,16 @@ export default {
   },
   methods: {
     _formatCLMS (origin) {
-      let clmsArr = (origin || '').split('@#'), html = ''
-      console.log('!!!!!!!!!!!!!'+ clmsArr.length)
-      for (let i = 0, len = clmsArr.length; i < len; i ++) {
-        let s = clmsArr[i]
-        if (s.trim()){
-          html += s + '<br/>'
-        }
-      }
+      let html = origin || ''
       let number = html.match(/[0-9]+[.]/g)
-      console.log('nmber!!!!!!!!!!!!!'+ number)
       if (number) {
-        console.log('not null')
         for(let i = 0, len = number.length; i < len; i++){
           if (i === 0) {
             html = html.replace(number[i], number[i] + '<span style="color: #409EFF;">')
           } else {
             html = html.replace(number[i], '</span>' + number[i] + '<span>')
           }
-          html = html.replace(number[i], `<span style="display:inline-block;text-align:center;color:white;margin-right:20px;width:26px;height:26px;background-color:#409EFF">${number[i]}</span>`)
+          html = html.replace(number[i], `<span style="color:blue;font-size: 18px;">${number[i]}</span>`)
         }
         html += '</span>'
       }
@@ -254,6 +260,7 @@ export default {
     },
     openDetails (row) {
       this.index = row.index
+      this.activeNames=['1']
       var an = row.an
       var citedAn = row.citedAn === '' ? '1' : row.citedAn
       this.patentLoading = true
@@ -269,6 +276,7 @@ export default {
         alert('已经是第一篇文献了')
         this.message = `已经是第一篇文献了:${+new Date()}`
       } else {
+        this.activeNames=['1']
         this.message = ''
         this.patentLoading = true
         this.index = this.index - 1
@@ -287,6 +295,7 @@ export default {
         alert('已经是最后一篇文献了')
         this.message = `已经是最后一篇文献了:${+new Date()}`
       } else {
+        this.activeNames=['1']
         this.message = ''
         this.patentLoading = true
         this.index = this.index + 1
@@ -303,7 +312,7 @@ export default {
     selectHighLight ({row, rowIndex}) {
       if (this.index === rowIndex) {
         return {
-          'background-color': 'LightSkyBlue',
+          'background-color': '#d9edf7',
           'cursor': 'pointer'
         }
       }
@@ -340,26 +349,34 @@ export default {
     this.pageLoading = true
     this.patentLoading = true
     this.searchAnList(ipc).then(() => {
-      cache.cacheIpc(ipc)
-      var an = this.compIpcResult[0].an
-      var citedAn = this.compIpcResult[0].citedAn === '' ? '1' : this.compIpcResult[0].citedAn
-      this.searchAnDetail({
-        an: an,
-        citedAn: citedAn
-      }).then(() => {
-        this.patentLoading = false
-      })
       this.pageLoading = false
+      cache.cacheIpc(ipc)
+      if(this.compIpcResult.length != 0) {
+        var an = this.compIpcResult[0].an
+        var citedAn = this.compIpcResult[0].citedAn === '' ? '1' : this.compIpcResult[0].citedAn
+        this.searchAnDetail({
+          an: an,
+          citedAn: citedAn
+        }).then(() => {
+
+        })
+      }
+      this.patentLoading = false
     })
   }
 }
 </script>
 <style scoped>
+  .page {
+    background-image: url('../../assets/images/bg1.jpg')!important;
+    background-attachment: fixed;
+    background-size: cover;
+  }
   .page-search .main {
-    max-width: 1300px !important;
+    max-width: 1340px !important;
   }
   .patent-detail {
-    padding: 15px;
+    padding: 10px;
     background-color: rgba(233, 233, 233, .5);
     border-radius: 7px;
   }
@@ -404,10 +421,10 @@ export default {
     box-shadow: inset 0 0 10px #CCC;
   }
   .card .head{
-     background-color: #409EFF;
+     background-color: #FFCA28;
      text-align: center;
      padding:15px 20px;
-     color:white;
+     color:black;
   }
   .card .card-main{
     padding:15px 20px;
@@ -419,8 +436,9 @@ export default {
     min-height:280px;
     max-height:350px;
   }
-  .el-collapse-item__content .desc-title{
-    color:red;
+  .el-collapse-item__header {
+    font-size: 14px;
+    font-weight: 600;
   }
 
 </style>
