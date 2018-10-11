@@ -83,6 +83,15 @@ let router = new Router({
         title: 'IPC下案卷比对',
         requireAuth: true
       }
+    },
+    {
+      path: '/electricalSearch',
+      name: 'ElectricalSearch',
+      component: () => import('../components/electrical/Result'),
+      meta: {
+        title: '电学发明标题标引',
+        requireAuth: true
+      }
     }
   ]
 })
