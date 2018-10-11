@@ -58,9 +58,10 @@
                           <el-button  size="mini"  type="primary" @click="addTitle(1)">添加</el-button>
                         </div>
                         <div class="marks">
-                          <h4>权利要求</h4>
+                          <h4>标题拆词参考</h4>
                           <p>
-                            <el-tag :disable-transitions=true  type="warning" class="mark-item" >目前此标引功能尚未开放</el-tag>
+                           <!-- <el-tag :disable-transitions=true  type="warning" class="mark-item" >目前此标引功能尚未开放</el-tag>-->
+                            <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'" class="mark-item"  v-for="item in chaiCiList" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
                           </p>
                         </div>
                       </div>
@@ -144,7 +145,8 @@
         'patentListResult',
         'patentInfoDetail',
         'pagination',
-        'markTiList'
+        'markTiList',
+        'chaiCiList'
       ]),
       currentPage () {
         let pagination = this.pagination
@@ -189,7 +191,8 @@
         'addTiMark',
         'deleteTiMark',
         'searchPatentFormTwo',
-        'searchPatentDetailAndMark'
+        'searchPatentDetailAndMark',
+        'searchChaiCi'
       ]),
       addTitle (type) {
         let word = document.querySelector("#input-title").value;
@@ -240,7 +243,11 @@
             }).then(() => {
               var an = this.patentListResult[0].an
               this.searchPatentDetailAndMark(an).then(() => {
-                this.patentLoading = false
+                var title=this.patentInfoDetail.TI
+                console.log(title)
+                this.searchChaiCi(title).then(() => {
+                  this.patentLoading = false
+                })
               })
             })
           }).catch(() => {
@@ -252,7 +259,11 @@
           }).then(() => {
             var an = this.patentListResult[0].an
             this.searchPatentDetailAndMark(an).then(() => {
-              this.patentLoading = false
+              var title=this.patentInfoDetail.TI
+              console.log(title)
+              this.searchChaiCi(title).then(() => {
+                this.patentLoading = false
+              })
             })
           })
         }
@@ -269,23 +280,21 @@
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
-           /* this.searchPatentDetail({
-              an: an
-            }).then(() => { })
-            this.showMarkTiList(an).then(() => {  this.patentLoading = false})*/
             this.searchPatentDetailAndMark(an).then(() => {
-              this.patentLoading = false
+              var title=this.patentInfoDetail.TI
+              this.searchChaiCi(title).then(() => {
+                this.patentLoading = false
+              })
             })
           }).catch(() => {
           })
         }else{
-         /* this.searchPatentDetail({
-            an: an
-          }).then(() => {})
-          this.showMarkTiList(an).then(() => {})
-          this.patentLoading = false*/
           this.searchPatentDetailAndMark(an).then(() => {
-            this.patentLoading = false
+            var title=this.patentInfoDetail.TI
+            this.searchChaiCi(title).then(() => {
+              console.log(this.chaiCiList)
+              this.patentLoading = false
+            })
           })
         }
       },
@@ -303,12 +312,10 @@
       onSubmit () {
         this.btnLoading = true
         let marks = this.markTiList.filter(mark => {
-          if (!mark.id) {
-            console.log(this.patentInfoDetail)
             mark['an'] = this.patentInfoDetail.NRD_AN
-          /*  mark['an']=this.patentListResult[this.index].oldan*/
-          }
-          return !mark.id
+            mark['citedAn'] = this.patentListResult[this.index].citedAn
+            console.log(this.patentListResult[this.index].citedAn)
+            return mark
         })
         this.addTiMark(marks).then(data => {
           if (data.flag) {
@@ -345,7 +352,10 @@
           console.log(this.index)
           var an = this.patentListResult[this.index].an
           this.searchPatentDetailAndMark(an).then(() => {
-            this.patentLoading = false
+            var title=this.patentInfoDetail.TI
+            this.searchChaiCi(title).then(() => {
+              this.patentLoading = false
+            })
           })
         }
       },
@@ -360,7 +370,10 @@
           this.index = this.index + 1
           var an = this.patentListResult[this.index].an
           this.searchPatentDetailAndMark(an).then(() => {
-            this.patentLoading = false
+            var title=this.patentInfoDetail.TI
+            this.searchChaiCi(title).then(() => {
+              this.patentLoading = false
+            })
           })
         }
       },
@@ -406,7 +419,9 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.deleteTiMark(mark.id).then((data) => {
+          this.markTiList.splice(this.markTiList.indexOf(mark), 1)
+          console.log(this.markTiList)
+          this.deleteTiMark(this.markTiList).then((data) => {
             if (data.flag) {
               this.$message({
                 type: 'success',
@@ -440,7 +455,10 @@
       this.searchPatent().then(() => {
         var an = this.patentListResult[0].an
         this.searchPatentDetailAndMark(an).then(() => {
-          this.patentLoading = false
+          var title=this.patentInfoDetail.TI
+          this.searchChaiCi(title).then(() => {
+            this.pageLoading = false
+          })
         })
       })
       next()
@@ -453,7 +471,11 @@
         if(this.patentListResult.length != 0) {
           var an = this.patentListResult[0].an
           this.searchPatentDetailAndMark(an).then(() => {
-            this.patentLoading = false
+            var title=this.patentInfoDetail.TI
+            this.searchChaiCi(title).then(() => {
+              this.patentLoading = false
+              this.pageLoading = false
+            })
           })
         }
       })

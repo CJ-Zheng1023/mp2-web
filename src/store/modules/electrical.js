@@ -8,7 +8,8 @@ export default {
       patentInfoDetail: '',
       pagination: '',
       patentInfo: '',
-      markTiList: ''
+      markTiList: '',
+      chaiCiList: ''
     }
   },
   mutations: {
@@ -21,6 +22,9 @@ export default {
     },
     showMarkTiListMutation (state, data) {
       state.markTiList = data.markTiList
+    },
+    showChaiCiMutation (state, data) {
+      state.chaiCiList = data.chaiCiList
     }
   },
   actions: {
@@ -98,20 +102,30 @@ export default {
         })
       })
     },
-    deleteTiMark ({commit}, markId) {
+    deleteTiMark ({commit}, marks) {
       console.log(window.localStorage.getItem('token'))
       return new Promise((resolve, reject) => {
         axios({
           url: MODULE_CONTEXT + '/mark/delete',
           method: 'post',
           data: {
-            markId
+            marks: JSON.stringify(marks)
           },
           params: {
             token: window.localStorage.getItem('token')
           }
         }).then(response => {
           resolve(response.data)
+        }).catch(e => {
+          console.log(e)
+        })
+      })
+    },
+    searchChaiCi ({commit}, ti) {
+      return new Promise((resolve, reject) => {
+        axios.get(MODULE_CONTEXT + `/chaici/list/${ti}?token=${window.localStorage.getItem('token')}`).then(response => {
+          commit('showChaiCiMutation', response.data)
+          resolve()
         }).catch(e => {
           console.log(e)
         })
