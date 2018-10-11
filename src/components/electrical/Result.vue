@@ -13,7 +13,7 @@
                   border
                   style="width: 100%;"  @row-click="openDetails" :row-class-name="tableRowClassName" :row-style="selectHighLight" :header-cell-style="{'background-color': '#409EFF','color': 'white','text-align':'center'}">
                   <el-table-column prop="oldan" width="155" label="申请号" class="table-item"></el-table-column>
-                  <el-table-column prop="pn" label="公开号" class="table-item"></el-table-column>
+                  <el-table-column prop="pn" width="150" label="公开号" class="table-item"></el-table-column>
                   <el-table-column prop="pIpcMain" label="主分类" class="table-item"></el-table-column>
                 </el-table>
               </el-row>
@@ -48,24 +48,29 @@
                     <div class="portlet-body">
                       <div class="marks-scroll ">
                         <div class="marks">
-                          <h4>发明名称</h4>
-                          <p>
-                            <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'" class="mark-item" @close="closeMark(item)" :closable="closable" v-for="item in tiWords" :key="item.word + item.type">{{item.word}}</el-tag>
-                          </p>
+                        <!--  <h4>发明名称</h4>-->
+                          <div class="patent-item">
+                            <label>发明名称:</label>
+                            <div class="content" tabindex='-1' @keyup.18="markWord(1, $event)">{{this.patentInfoDetail.TI}}</div>
+                          </div>
+                          <div class="marks">
+                            <h4>标题拆词参考</h4>
+                            <p>
+                              <!-- <el-tag :disable-transitions=true  type="warning" class="mark-item" >目前此标引功能尚未开放</el-tag>-->
+                              <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'" class="mark-item"  v-for="item in chaiCiList" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
+                            </p>
+                          </div>
                         </div>
                         <div>
-                          <textarea rows="5" cols="37" id="input-title" placeholder="目前没有手动添加的词"></textarea>
+                          <textarea rows="5" cols="30" id="input-title" placeholder="目前没有手动添加的词"></textarea>
                           <el-button  size="mini"  type="primary" @click="addTitle(1)">添加</el-button>
                         </div>
-                        <div class="marks">
-                          <h4>标题拆词参考</h4>
-                          <p>
-                           <!-- <el-tag :disable-transitions=true  type="warning" class="mark-item" >目前此标引功能尚未开放</el-tag>-->
-                            <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'" class="mark-item"  v-for="item in chaiCiList" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
-                          </p>
-                        </div>
+                        <p>
+                          <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'" class="mark-item" @close="closeMark(item)" :closable="closable" v-for="item in tiWords" :key="item.word + item.type">{{item.word}}</el-tag>
+                        </p>
                       </div>
                     </div>
+                    <el-row><el-button-group class="prev-next-btn"><el-button type="primary" plain  @click="prev" class="prev-patent" icon="el-icon-arrow-left">上一篇</el-button><el-button type="primary" plain  @click="next" class="next-patent">下一篇<i class="el-icon-arrow-right el-icon--right"></i></el-button></el-button-group></el-row>
                     <div class="dialog-footer">
                       <!-- <el-button @click="">取消</el-button>-->
                       <el-button :loading="btnLoading" type="primary" @click="onSubmit" :disabled="saved" >保存标引词</el-button>
@@ -83,6 +88,13 @@
                         <div class="patent-item">
                           <label>发明名称:</label>
                           <div class="content" tabindex='-1' @keyup.18="markWord(1, $event)">{{this.patentInfoDetail.TI}}</div>
+                        </div>
+                        <div class="grid-content bg-purple">
+                          <el-collapse v-model="activeNames" accordion>
+                            <el-collapse-item title="权利要求" name="3">
+                              <div v-html="patentInfoDetail.CLIMS"></div>
+                            </el-collapse-item>
+                          </el-collapse>
                         </div>
                         <div class="patent-item">
                           <label>发明人:</label>
@@ -106,7 +118,7 @@
                               <div v-html="patentInfoDetail.DESC">
                               </div>
                             </el-collapse-item>
-                            <el-collapse-item title="权利要求" name="3">
+                            <el-collapse-item title="权利要求" name="6">
                               <div v-html="patentInfoDetail.CLIMS"></div>
                             </el-collapse-item>
                           </el-collapse>
