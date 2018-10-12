@@ -48,11 +48,11 @@ export default {
         })
       })
     },
-    searchPatentDetailAndMark ({commit}, an) {
+    searchPatentDetailAndMark ({commit}, {an, citedAn}) {
       return new Promise((resolve, reject) => {
         axios.all([
           axios.get(MODULE_CONTEXT + `/search/list/${an}?token=${window.localStorage.getItem('token')}`),
-          axios.get(MODULE_CONTEXT + `/list/${an}?token=${window.localStorage.getItem('token')}`)
+          axios.get(MODULE_CONTEXT + `/list/${an}/${citedAn}?token=${window.localStorage.getItem('token')}`)
         ]).then(axios.spread((detailResponse, markResponse) => {
           commit('searchPatentDetailMutation', detailResponse.data)
           commit('showMarkTiListMutation', markResponse.data)
@@ -73,9 +73,9 @@ export default {
         })
       })
     },
-    showMarkTiList ({commit}, an) {
+    showMarkTiList ({commit}, {an, citedAn}) {
       return new Promise((resolve, reject) => {
-        axios.get(MODULE_CONTEXT + `/list/${an}?token=${window.localStorage.getItem('token')}`).then(response => {
+        axios.get(MODULE_CONTEXT + `/list/${an}/${citedAn}?token=${window.localStorage.getItem('token')}`).then(response => {
           commit('showMarkTiListMutation', response.data)
           resolve()
         }).catch(e => {

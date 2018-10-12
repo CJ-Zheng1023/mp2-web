@@ -238,7 +238,8 @@
               start: (curPage - 1) * this.pagination.size
             }).then(() => {
               var an = this.patentListResult[0].an
-              this.searchPatentDetailAndMark(an).then(() => {
+              var citedAn = this.patentListResult[0].citedAn
+              this.searchPatentDetailAndMark({an,citedAn}).then(() => {
                 var title=this.patentInfoDetail.TI
                 console.log(title)
                 this.searchChaiCi(title).then(() => {
@@ -251,8 +252,9 @@
         this.index = row.index
         this.activeNames=['3']
         var an = row.an
+        var citedAn = row.citedAn
         this.patentLoading = true
-        this.searchPatentDetailAndMark(an).then(() => {
+        this.searchPatentDetailAndMark({an,citedAn}).then(() => {
               var title=this.patentInfoDetail.TI
               this.searchChaiCi(title).then(() => {
                 this.patentLoading = false
@@ -297,7 +299,11 @@
               }).then(action => {
                 this.$emit('mark')
                 this.loading = true
-                this.showMarkTiList(this.patentInfoDetail.NRD_AN).then(() => {
+                var an=this.patentListResult[this.index].an
+                var citedAn=this.patentListResult[this.index].citedAn
+                console.log(an)
+                console.log(citedAn)
+                this.showMarkTiList({an,citedAn}).then(() => {
                   this.loading = false
                   this.btnLoading = false
                 })
@@ -324,7 +330,8 @@
           this.index = this.index - 1
           console.log(this.index)
           var an = this.patentListResult[this.index].an
-          this.searchPatentDetailAndMark(an).then(() => {
+          var citedAn = this.patentListResult[this.index].citedAn
+          this.searchPatentDetailAndMark({an,citedAn}).then(() => {
             var title=this.patentInfoDetail.TI
             this.searchChaiCi(title).then(() => {
               this.patentLoading = false
@@ -342,7 +349,8 @@
           this.patentLoading = true
           this.index = this.index + 1
           var an = this.patentListResult[this.index].an
-          this.searchPatentDetailAndMark(an).then(() => {
+          var citedAn = this.patentListResult[this.index].citedAn
+          this.searchPatentDetailAndMark({an,citedAn}).then(() => {
             var title=this.patentInfoDetail.TI
             this.searchChaiCi(title).then(() => {
               this.patentLoading = false
@@ -381,7 +389,11 @@
                 type: 'success',
                 message: '删除成功!'
               })
-              this.showMarkTiList(this.patentInfoDetail.NRD_AN).then(() => {
+              var an=this.patentListResult[this.index].an
+              var citedAn=this.patentListResult[this.index].citedAn
+              console.log(an)
+              console.log(citedAn)
+              this.showMarkTiList({an,citedAn}).then(() => {
                 if (this.markTiList.length === 0) {
                   this.$emit('unmark')
                 }
@@ -407,8 +419,9 @@
     beforeRouteUpdate (to, from, next) {
       this.pageLoading = true
       this.searchPatent().then(() => {
-        var an = this.patentListResult[0].an
-        this.searchPatentDetailAndMark(an).then(() => {
+        var an = this.patentListResult[this.index].an
+        var citedAn = this.patentListResult[this.index].citedAn
+        this.searchPatentDetailAndMark({an,citedAn}).then(() => {
           var title=this.patentInfoDetail.TI
           this.searchChaiCi(title).then(() => {
             this.pageLoading = false
@@ -424,7 +437,8 @@
         this.pageLoading = false
         if(this.patentListResult.length != 0) {
           var an = this.patentListResult[0].an
-          this.searchPatentDetailAndMark(an).then(() => {
+          var citedAn = this.patentListResult[0].citedAn
+          this.searchPatentDetailAndMark({an,citedAn}).then(() => {
             var title=this.patentInfoDetail.TI
             this.searchChaiCi(title).then(() => {
               this.patentLoading = false
