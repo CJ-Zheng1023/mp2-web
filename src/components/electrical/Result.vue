@@ -41,7 +41,9 @@
           </el-col>
           <el-col :span="16">
             <div class="patent-detail-warp" v-loading="patentLoading">
-              <el-row><el-button-group class="prev-next-btn"><el-button type="primary" plain  @click="prev" class="prev-patent" icon="el-icon-arrow-left">上一篇</el-button><el-button type="primary" plain  @click="next" class="next-patent">下一篇<i class="el-icon-arrow-right el-icon--right"></i></el-button></el-button-group></el-row>
+<!--
+              <el-row><el-button-group class="prev-next-btn"><el-button type="primary" plain  @click="prev" class="prev-patent" icon="el-icon-arrow-left">上一篇</el-button><el-button type="primary" plain  @click="next" class="next-patent">下一篇<i class="el-icon-arrow-right el-icon&#45;&#45;right"></i></el-button></el-button-group></el-row>
+-->
               <el-row :gutter="20">
                 <el-col :span="12" class="mark-title">
                   <div class="portlet">
@@ -50,30 +52,42 @@
                         <div class="marks">
                         <!--  <h4>发明名称</h4>-->
                           <div class="patent-item">
-                            <label>发明名称:</label>
-                            <div class="content" tabindex='-1' @keyup.18="markWord(1, $event)">{{this.patentInfoDetail.TI}}</div>
+                            <el-alert
+                              title="标题可以通过鼠标按住Crtl键进行划词"
+                              type="warning">
+                            </el-alert>
+                            <div class="title">
+                               <label>发明名称:</label>
+                            </div>
+                            <div class="content title-content" tabindex='-1' @keyup.18="markWord(1, $event)">{{this.patentInfoDetail.TI}}</div>
                           </div>
-                          <div class="marks">
-                            <h4>标题拆词参考</h4>
-                            <p>
-                              <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'" class="mark-item"  v-for="item in chaiCiList" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
-                            </p>
-                          </div>
+                        </div>
+                        <div class="refer">
+                          <i class="el-icon-star-off"></i><label>标题拆词参考:</label>
+                        </div>
+                        <div>
+                          <p>
+                            <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" class="mark-item"  v-for="item in chaiCiList" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
+                          </p>
+                        </div>
+                        <div class="refer">
+                          <i class="el-icon-star-off"></i><label>检索式编写:</label>
                         </div>
                         <div>
                           <textarea v-if="tiWords.length !== 0" rows="5" cols="40" id="input-title" v-model="tiWords[0].word"></textarea>
-                         <!-- <textarea v-else v-model="tiWords[0].word" rows="5" cols="40"></textarea>-->
+                          <!-- <textarea v-else v-model="tiWords[0].word" rows="5" cols="40"></textarea>-->
                           <el-button  size="mini"  type="primary" @click="connectAnd">AND</el-button>
                           <el-button  size="mini"  type="primary" @click="connectOr">OR</el-button>
+                          <el-button  size="mini"  type="primary" @click="connectZuokuohao">(</el-button>
+                          <el-button  size="mini"  type="primary" @click="connectYoukuohao">)</el-button>
                           <!--<el-button  size="mini"  type="primary" @click="addTitle(1)">添加</el-button>-->
                         </div>
-
                       </div>
                     </div>
                     <div class="dialog-footer">
                       <el-button :loading="btnLoading" type="primary" @click="onSubmit"  >保存标引词</el-button>
                     </div>
-                    <el-row><el-button-group class="prev-next-btn"><el-button type="primary" plain  @click="prev" class="prev-patent" icon="el-icon-arrow-left">上一篇</el-button><el-button type="primary" plain  @click="next" class="next-patent">下一篇<i class="el-icon-arrow-right el-icon--right"></i></el-button></el-button-group></el-row>
+                    <el-row><el-button-group size="small"  class="prev-next-btn"><el-button type="primary" plain  @click="prev" class="prev-patent" icon="el-icon-arrow-left">上一篇</el-button><el-button type="primary" plain  @click="next" class="next-patent">下一篇<i class="el-icon-arrow-right el-icon--right"></i></el-button></el-button-group></el-row>
                   </div>
                 </el-col>
                 <el-col :span="12" class="patent-detail">
@@ -84,10 +98,10 @@
                           <label>申请号:</label>
                           <div class="content">{{this.patentInfoDetail.NRD_AN}}</div>
                         </div>
-                        <div class="patent-item">
+                        <!--<div class="patent-item">
                           <label>发明名称:</label>
                           <div class="content" tabindex='-1' @keyup.18="markWord(1, $event)">{{this.patentInfoDetail.TI}}</div>
-                        </div>
+                        </div>-->
                         <div class="grid-content bg-purple">
                           <el-collapse v-model="activeNames" accordion>
                             <el-collapse-item title="权利要求" name="3">
@@ -144,7 +158,7 @@
       return {
         patentLoading: false,
         pageLoading: false,
-        activeNames: ['1'],
+        activeNames: ['3'],
         index: 0,
         message: '',
         btnLoading: false,
@@ -179,17 +193,6 @@
       },
       closable () {
           return true
-      },
-      saved () {
-        let flag = true
-        if (!this.markTiList) {
-          return flag
-        }
-        for (let i = 0, length = this.markTiList.length; i < length; i++) {
-          let item = this.markTiList[i]
-          flag = false
-        }
-        return flag
       }
     },
     methods: {
@@ -216,49 +219,20 @@
         let valuenew=value+' or ';
         this.tiWords[0].word=valuenew;
       },
-     /* addTitle (type) {
-        let word = document.querySelector("#input-title").value;
-        console.log(word.length)
-        if(word.length == 0){
-          this.$alert(`没有词要添加`, '提示', {
-            confirmButtonText: '确定',
-            type: 'warning'
-          })
-          return
-        }else{
-          let flag = false
-          for (let i = 0, len = this.markTiList.length; i < len; i++) {
-            let item = this.markTiList[i]
-            if (word + type === item.word + item.type) {
-              flag = true
-              break
-            }
-          }
-          if (flag) {
-            this.$alert(`${word}已添加为标引词`, '提示', {
-              confirmButtonText: '确定',
-              type: 'warning'
-            })
-            return
-          }
-          this.markTiList.splice(0,this.showMarkTiList.length).push({
-            type,
-            word,
-            userId: window.localStorage.getItem('userId')
-          })
-          document.querySelector("#input-title").value=""
-        }
-      },*/
+      connectZuokuohao () {
+        let value=this.tiWords[0].word
+        let valuenew=value+' ( ';
+        this.tiWords[0].word=valuenew;
+      },
+      connectYoukuohao () {
+        let value=this.tiWords[0].word
+        let valuenew=value+' ) ';
+        this.tiWords[0].word=valuenew;
+      },
       clickPagination (curPage) {
         this.patentLoading = true
         this.index=0
-        this.activeNames=['1']
-      /*  if (!this.saved) {
-          this.$confirm('您尚有未保存的标引词, 是否离开?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {*/
+        this.activeNames=['3']
             this.searchPatentFormTwo({
               size: this.pagination.size,
               start: (curPage - 1) * this.pagination.size
@@ -272,27 +246,10 @@
                 })
               })
             })
-         /* }).catch(() => {
-          })*/
-       /* }else{
-          this.searchPatentFormTwo({
-            size: this.pagination.size,
-            start: (curPage - 1) * this.pagination.size
-          }).then(() => {
-            var an = this.patentListResult[0].an
-            this.searchPatentDetailAndMark(an).then(() => {
-              var title=this.patentInfoDetail.TI
-              console.log(title)
-              this.searchChaiCi(title).then(() => {
-                this.patentLoading = false
-              })
-            })
-          })
-        }*/
       },
       openDetails (row) {
         this.index = row.index
-        this.activeNames=['1']
+        this.activeNames=['3']
         var an = row.an
         this.patentLoading = true
         this.searchPatentDetailAndMark(an).then(() => {
@@ -315,8 +272,13 @@
       },
       onSubmit () {
         this.btnLoading = true
-        let marks = []
-        this.tiWords.forEach(mark => {
+        console.log(this.tiWords)
+        if(this.tiWords[0].word == "") {
+          alert("没有数据要保存");
+          this.btnLoading = false
+        }else{
+          let marks = []
+          this.tiWords.forEach(mark => {
             let  m = Object.create(null)
             m['an'] = this.patentInfoDetail.NRD_AN
             m['citedAn'] = this.patentListResult[this.index].citedAn
@@ -326,36 +288,37 @@
             marks.push(m)
             /* mark['an'] = this.patentInfoDetail.NRD_AN
             mark['citedAn'] = this.patentListResult[this.index].citedAn */
-        })
-        this.addTiMark(marks).then(data => {
-          if (data.flag) {
-            this.$alert('添加成功', '提示', {
-              confirmButtonText: '确定',
-              type: 'success'
-            }).then(action => {
-              this.$emit('mark')
-              this.loading = true
-              this.showMarkTiList(this.patentInfoDetail.NRD_AN).then(() => {
-                this.loading = false
+          })
+          this.addTiMark(marks).then(data => {
+            if (data.flag) {
+              this.$alert('添加成功', '提示', {
+                confirmButtonText: '确定',
+                type: 'success'
+              }).then(action => {
+                this.$emit('mark')
+                this.loading = true
+                this.showMarkTiList(this.patentInfoDetail.NRD_AN).then(() => {
+                  this.loading = false
+                  this.btnLoading = false
+                })
+              })
+            } else {
+              this.$alert('添加失败', '提示', {
+                confirmButtonText: '确定',
+                type: 'error'
+              }).then(action => {
                 this.btnLoading = false
               })
-            })
-          } else {
-            this.$alert('添加失败', '提示', {
-              confirmButtonText: '确定',
-              type: 'error'
-            }).then(action => {
-              this.btnLoading = false
-            })
-          }
-        })
+            }
+          })
+        }
       },
       prev () {
         if (this.index === 0) {
           alert('已经是第一篇文献了')
           this.message = `已经是第一篇文献了:${+new Date()}`
         } else {
-          this.activeNames=['1']
+          this.activeNames=['3']
           this.message = ''
           this.patentLoading = true
           this.index = this.index - 1
@@ -374,7 +337,7 @@
           alert('已经是最后一篇文献了')
           this.message = `已经是最后一篇文献了:${+new Date()}`
         } else {
-          this.activeNames=['1']
+          this.activeNames=['3']
           this.message = ''
           this.patentLoading = true
           this.index = this.index + 1
@@ -398,7 +361,6 @@
       },
       markWord (type, event) {
         let word = this._getSelectText()
-        //this.tiWords[0].word=this.tiWords[0].word+" "+word
         this.tiWords[0].word= this.tiWords[0].word+" "+word
       },
       closeMark (mark) {
@@ -475,10 +437,6 @@
   }
 </script>
 <style scoped>
-/*  .page {
-    background-attachment: fixed;
-    background-size: cover;
-  }*/
   .page-search .main {
     max-width: 1340px !important;
   }
@@ -538,5 +496,22 @@
     text-align: right;
     margin-top:20px;
     margin-bottom:20px;
+  }
+  .refer label{
+    line-height: 40px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .refer{
+     padding-left:20px;
+     position: relative;
+  }
+  .refer i{
+    position: absolute;
+    left:0;
+    top:28%;
+  }
+  .title-content{
+   font-weight: 900;
   }
 </style>
