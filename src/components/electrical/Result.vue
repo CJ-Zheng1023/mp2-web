@@ -56,25 +56,24 @@
                           <div class="marks">
                             <h4>标题拆词参考</h4>
                             <p>
-                              <!-- <el-tag :disable-transitions=true  type="warning" class="mark-item" >目前此标引功能尚未开放</el-tag>-->
                               <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'" class="mark-item"  v-for="item in chaiCiList" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
                             </p>
                           </div>
                         </div>
                         <div>
-                          <textarea rows="5" cols="30" id="input-title" placeholder="目前没有手动添加的词"></textarea>
-                          <el-button  size="mini"  type="primary" @click="addTitle(1)">添加</el-button>
+                          <textarea v-if="tiWords.length !== 0" rows="5" cols="40" id="input-title" v-model="tiWords[0].word"></textarea>
+                         <!-- <textarea v-else v-model="tiWords[0].word" rows="5" cols="40"></textarea>-->
+                          <el-button  size="mini"  type="primary" @click="connectAnd">AND</el-button>
+                          <el-button  size="mini"  type="primary" @click="connectOr">OR</el-button>
+                          <!--<el-button  size="mini"  type="primary" @click="addTitle(1)">添加</el-button>-->
                         </div>
-                        <p>
-                          <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'" class="mark-item" @close="closeMark(item)" :closable="closable" v-for="item in tiWords" :key="item.word + item.type">{{item.word}}</el-tag>
-                        </p>
+
                       </div>
                     </div>
-                    <el-row><el-button-group class="prev-next-btn"><el-button type="primary" plain  @click="prev" class="prev-patent" icon="el-icon-arrow-left">上一篇</el-button><el-button type="primary" plain  @click="next" class="next-patent">下一篇<i class="el-icon-arrow-right el-icon--right"></i></el-button></el-button-group></el-row>
                     <div class="dialog-footer">
-                      <!-- <el-button @click="">取消</el-button>-->
-                      <el-button :loading="btnLoading" type="primary" @click="onSubmit" :disabled="saved" >保存标引词</el-button>
+                      <el-button :loading="btnLoading" type="primary" @click="onSubmit"  >保存标引词</el-button>
                     </div>
+                    <el-row><el-button-group class="prev-next-btn"><el-button type="primary" plain  @click="prev" class="prev-patent" icon="el-icon-arrow-left">上一篇</el-button><el-button type="primary" plain  @click="next" class="next-patent">下一篇<i class="el-icon-arrow-right el-icon--right"></i></el-button></el-button-group></el-row>
                   </div>
                 </el-col>
                 <el-col :span="12" class="patent-detail">
@@ -149,7 +148,8 @@
         index: 0,
         message: '',
         btnLoading: false,
-        addTitleed:false
+        addTitleed: false,
+        content: ''
       }
     },
     computed: {
@@ -187,10 +187,7 @@
         }
         for (let i = 0, length = this.markTiList.length; i < length; i++) {
           let item = this.markTiList[i]
-          if (!item.id) {
-            flag = false
-            break
-          }
+          flag = false
         }
         return flag
       }
@@ -206,7 +203,20 @@
         'searchPatentDetailAndMark',
         'searchChaiCi'
       ]),
-      addTitle (type) {
+      inputExp (event) {
+        this.tiWords[0].word = event.target.value
+      },
+      connectAnd () {
+        let value=this.tiWords[0].word
+        let valuenew=value+' and ';
+        this.tiWords[0].word=valuenew;
+      },
+      connectOr () {
+        let value=this.tiWords[0].word
+        let valuenew=value+' or ';
+        this.tiWords[0].word=valuenew;
+      },
+     /* addTitle (type) {
         let word = document.querySelector("#input-title").value;
         console.log(word.length)
         if(word.length == 0){
@@ -231,24 +241,24 @@
             })
             return
           }
-          this.markTiList.push({
+          this.markTiList.splice(0,this.showMarkTiList.length).push({
             type,
             word,
             userId: window.localStorage.getItem('userId')
           })
           document.querySelector("#input-title").value=""
         }
-      },
+      },*/
       clickPagination (curPage) {
         this.patentLoading = true
         this.index=0
         this.activeNames=['1']
-        if (!this.saved) {
+      /*  if (!this.saved) {
           this.$confirm('您尚有未保存的标引词, 是否离开?', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
-          }).then(() => {
+          }).then(() => {*/
             this.searchPatentFormTwo({
               size: this.pagination.size,
               start: (curPage - 1) * this.pagination.size
@@ -262,9 +272,9 @@
                 })
               })
             })
-          }).catch(() => {
-          })
-        }else{
+         /* }).catch(() => {
+          })*/
+       /* }else{
           this.searchPatentFormTwo({
             size: this.pagination.size,
             start: (curPage - 1) * this.pagination.size
@@ -278,37 +288,19 @@
               })
             })
           })
-        }
+        }*/
       },
       openDetails (row) {
         this.index = row.index
         this.activeNames=['1']
         var an = row.an
         this.patentLoading = true
-        console.log(this.patentLoading)
-        if (!this.saved) {
-          this.$confirm('您尚有未保存的标引词, 是否离开?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-            this.searchPatentDetailAndMark(an).then(() => {
+        this.searchPatentDetailAndMark(an).then(() => {
               var title=this.patentInfoDetail.TI
               this.searchChaiCi(title).then(() => {
                 this.patentLoading = false
               })
-            })
-          }).catch(() => {
-          })
-        }else{
-          this.searchPatentDetailAndMark(an).then(() => {
-            var title=this.patentInfoDetail.TI
-            this.searchChaiCi(title).then(() => {
-              console.log(this.chaiCiList)
-              this.patentLoading = false
-            })
-          })
-        }
+         })
       },
       tableRowClassName ({row, rowIndex}) {
         row.index = rowIndex
@@ -323,11 +315,17 @@
       },
       onSubmit () {
         this.btnLoading = true
-        let marks = this.markTiList.filter(mark => {
-            mark['an'] = this.patentInfoDetail.NRD_AN
-            mark['citedAn'] = this.patentListResult[this.index].citedAn
-            console.log(this.patentListResult[this.index].citedAn)
-            return mark
+        let marks = []
+        this.tiWords.forEach(mark => {
+            let  m = Object.create(null)
+            m['an'] = this.patentInfoDetail.NRD_AN
+            m['citedAn'] = this.patentListResult[this.index].citedAn
+            m['userId'] = mark['userId']
+            m['type'] = mark['type']
+            m['word'] = mark['word']
+            marks.push(m)
+            /* mark['an'] = this.patentInfoDetail.NRD_AN
+            mark['citedAn'] = this.patentListResult[this.index].citedAn */
         })
         this.addTiMark(marks).then(data => {
           if (data.flag) {
@@ -400,26 +398,8 @@
       },
       markWord (type, event) {
         let word = this._getSelectText()
-        let flag = false
-        for (let i = 0, len = this.markTiList.length; i < len; i++) {
-          let item = this.markTiList[i]
-          if (word + type === item.word + item.type) {
-            flag = true
-            break
-          }
-        }
-        if (flag) {
-          this.$alert(`${word}已添加为标引词`, '提示', {
-            confirmButtonText: '确定',
-            type: 'warning'
-          })
-          return
-        }
-        this.markTiList.push({
-          type,
-          word,
-          userId: window.localStorage.getItem('userId')
-        })
+        //this.tiWords[0].word=this.tiWords[0].word+" "+word
+        this.tiWords[0].word= this.tiWords[0].word+" "+word
       },
       closeMark (mark) {
         if (!mark.id) {
@@ -557,5 +537,6 @@
   .dialog-footer{
     text-align: right;
     margin-top:20px;
+    margin-bottom:20px;
   }
 </style>
