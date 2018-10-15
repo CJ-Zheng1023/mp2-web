@@ -151,7 +151,6 @@
 <script>
   import SearchHeader from '../SearchHeader'
   import { mapState, mapActions } from 'vuex'
-  import cache from '../../assets/scripts/cache'
   export default {
     name: 'electricalResult',
     data () {
@@ -161,9 +160,7 @@
         activeNames: ['3'],
         index: 0,
         message: '',
-        btnLoading: false,
-        addTitleed: false,
-        content: ''
+        btnLoading: false
       }
     },
     computed: {
@@ -178,21 +175,12 @@
         let pagination = this.pagination
         return (pagination.start + pagination.size) / pagination.size
       },
-      showMarks () {
-        if (!this.markTiList) {
-          return []
-        }
-        return this.markTiList
-      },
       tiWords () {
-        let marks = this.showMarks
+        let marks = this.markTiList
         if (!marks) {
           return []
         }
         return marks.filter(mark => Number(mark.type) === 1)
-      },
-      closable () {
-          return true
       }
     },
     methods: {
@@ -206,9 +194,6 @@
         'searchPatentDetailAndMark',
         'searchChaiCi'
       ]),
-      inputExp (event) {
-        this.tiWords[0].word = event.target.value
-      },
       connectAnd () {
         let value=this.tiWords[0].word
         let valuenew=value+' and ';
@@ -233,20 +218,19 @@
         this.patentLoading = true
         this.index=0
         this.activeNames=['3']
-            this.searchPatentFormTwo({
+        this.searchPatentFormTwo({
               size: this.pagination.size,
               start: (curPage - 1) * this.pagination.size
-            }).then(() => {
+         }).then(() => {
               var an = this.patentListResult[0].an
               var citedAn = this.patentListResult[0].citedAn
               this.searchPatentDetailAndMark({an,citedAn}).then(() => {
-                var title=this.patentInfoDetail.TI
-                console.log(title)
-                this.searchChaiCi(title).then(() => {
-                  this.patentLoading = false
-                })
+                  var title=this.patentInfoDetail.TI
+                  this.searchChaiCi(title).then(() => {
+                      this.patentLoading = false
+                  })
               })
-            })
+         })
       },
       openDetails (row) {
         this.index = row.index
@@ -288,8 +272,6 @@
             m['type'] = mark['type']
             m['word'] = mark['word']
             marks.push(m)
-            /* mark['an'] = this.patentInfoDetail.NRD_AN
-            mark['citedAn'] = this.patentListResult[this.index].citedAn */
           })
           this.addTiMark(marks).then(data => {
             if (data.flag) {
@@ -297,12 +279,9 @@
                 confirmButtonText: '确定',
                 type: 'success'
               }).then(action => {
-                this.$emit('mark')
                 this.loading = true
                 var an=this.patentListResult[this.index].an
                 var citedAn=this.patentListResult[this.index].citedAn
-                console.log(an)
-                console.log(citedAn)
                 this.showMarkTiList({an,citedAn}).then(() => {
                   this.loading = false
                   this.btnLoading = false
