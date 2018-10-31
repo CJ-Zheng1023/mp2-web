@@ -396,6 +396,7 @@
       SearchHeader
     },
     beforeRouteUpdate (to, from, next) {
+      alert("111")
       this.pageLoading = true
       this.searchPatent().then(() => {
         var an = this.patentListResult[this.index].an
