@@ -85,6 +85,15 @@ let router = new Router({
       }
     },
     {
+      path: '/patent',
+      name: 'PatentResult',
+      component: () => import('../components/patent/Result'),
+      meta: {
+        title: '案卷比对',
+        requireAuth: true
+      }
+    },
+    {
       path: '/electricalSearch',
       name: 'ElectricalSearch',
       component: () => import('../components/electrical/Result'),

@@ -5,6 +5,7 @@ import ipc from './modules/ipc'
 import address from './modules/address'
 import comp from './modules/comp'
 import electrical from './modules/electrical'
+import patent from './modules/patent'
 Vue.use(Vuex)
 export default new Vuex.Store({
   modules: {
@@ -12,6 +13,7 @@ export default new Vuex.Store({
     ipcModule: ipc,
     addressModule: address,
     compModule: comp,
-    electricalModule: electrical
+    electricalModule: electrical,
+    patentModule: patent
   }
 })

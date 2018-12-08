@@ -18,7 +18,7 @@
             </div>
           </el-card>
         </el-col>
-        <el-col :span="6">
+    <!--    <el-col :span="6">
           <el-card :body-style="{ padding: '0px' }">
             <div class="card-header" style="background: linear-gradient(90deg, #2c95c2, #72ebfd);">
               <img src="../assets/images/card-bg.png" width="100%" />
@@ -32,7 +32,7 @@
               </router-link>
             </div>
           </el-card>
-        </el-col>
+        </el-col>-->
         <el-col :span="6">
           <el-card :body-style="{ padding: '0px' }">
             <div class="card-header" style="background: linear-gradient(90deg, #145978, #1e769c);">
@@ -43,6 +43,21 @@
             </div>
             <div style="padding: 14px;">
               <router-link to="/compSearch">
+                <el-button type="text" class="button">Ipc案卷比对</el-button>
+              </router-link>
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="6">
+          <el-card :body-style="{ padding: '0px' }">
+            <div class="card-header" style="background: linear-gradient(90deg, #145978, #1e769c);">
+              <img src="../assets/images/card-bg.png" width="100%" />
+              <div class="circle">
+                <i class="fa fa-2x fa-key" style="color: #00adef;"></i>
+              </div>
+            </div>
+            <div style="padding: 14px;">
+              <router-link to="/patent">
                 <el-button type="text" class="button">案卷比对</el-button>
               </router-link>
             </div>
