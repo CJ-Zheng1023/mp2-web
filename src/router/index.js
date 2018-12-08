@@ -101,6 +101,15 @@ let router = new Router({
         title: '电学发明标题标引',
         requireAuth: true
       }
+    },
+    {
+      path: '/ZKPatentMark',
+      name: 'ZKPatentMark',
+      component: () => import('../components/ZKPatentMark/Result'),
+      meta: {
+        title: '智库案卷标引',
+        requireAuth: true
+      }
     }
   ]
 })
