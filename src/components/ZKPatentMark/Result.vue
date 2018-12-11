@@ -11,14 +11,28 @@
                 <el-table
                   :data="zkPatentListResult"
                   border
-                  style="width: 100%;"  :header-cell-style="{'background-color': '#409EFF','color': 'white','text-align':'center'}">
+                  style="width: 100%;" @row-click="openDetails" :row-class-name="tableRowClassName" :row-style="selectHighLight"  :header-cell-style="{'background-color': ' #EDEDED','color': '#5E5E5E','text-align':'center'}">
                   <el-table-column prop="Ap" width="155" label="申请号" class="table-item"></el-table-column>
                  <!-- <el-table-column prop="PD" width="150" label="公开日" class="table-item"></el-table-column>-->
                   <el-table-column prop="ipcMain" label="主分类" class="table-item"></el-table-column>
                 </el-table>
               </el-row>
               <el-row :gutter="10">
-                <el-col :span="24">
+                <el-col>
+                  <div class="pagination">
+                    <el-pagination
+                      @current-change="clickZKPagination"
+                      background
+                      font-size="12px !important"
+                      :current-page="currentPage"
+                      layout="prev, pager, next"
+                      :page-size="pagination.size"
+                      :pager-count="7"
+                      :small="true"
+                      :total="pagination.total">
+                    </el-pagination>
+                  </div>
+                  <div>案卷总数：{{pagination.total}}</div>
                 </el-col>
               </el-row>
             </div>
@@ -30,7 +44,7 @@
           </el-col>
           <el-col :span="18">
             <div class="patent-detail-warp" v-loading="patentLoading">
-              <el-row :gutter="20">
+              <el-row :gutter="5">
                 <el-col :span="12" class="mark-title">
                   <div class="portlet">
                     <div class="portlet-body">
@@ -41,28 +55,34 @@
                               title="标题和权力要求可以通过鼠标按住Crtl键进行划词"
                               type="warning">
                             </el-alert>
+                            <el-alert
+                              title="增加或删除标引词一定要点击最下面的‘保存标引词’按钮才会生效"
+                              type="warning">
+                            </el-alert>
                           </div>
                           <div class="refer">
                             <i class="el-icon-star-off"></i><label>标题拆词参考:</label>
+                            <el-button type="primary" plain @click="addMarkTi" size="mini" style="float: right">添加</el-button>
                           </div>
                           <div>
                             <p>
                               <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" class="mark-item"  v-for="item in ZKchaiCiList" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
                             </p>
                           </div>
-                          <div>标题拆词</div>
-                          <div>1111
-                            <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'" class="mark-item"  v-for="item in tiWords" :key="item.word + item.type">{{item.word}}</el-tag>
+                          <div >标题拆词如下:</div>
+                          <div style="min-height: 50px;margin-top:10px;">
+                            <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'" @close="closeMark(item)" :closable="true" class="mark-item"  v-for="item in ZKTiWords" :key="item.word + item.type">{{item.word}}</el-tag>
                           </div>
                           <div class="refer">
                             <i class="el-icon-star-off"></i><label>权利要求拆词参考:</label>
+                            <el-button type="primary" plain @click="addMarkClms" size="mini" style="float: right">添加</el-button>
                           </div>
                           <div>
                             <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" class="mark-item"  v-for="item in ClmsChaici" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
                           </div>
-                          <div>权利要求拆词</div>
-                          <div>
-                            <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'"  @close="closeMark(item)"  class="mark-item"  v-for="item in clmsWords" :key="item.word + item.type">{{item.word}}</el-tag>
+                          <div>权利要求拆词如下:</div>
+                          <div style="min-height: 50px;margin-top:10px;">
+                            <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'"  @close="closeMark(item)" :closable="true"  class="mark-item"  v-for="item in clmsWords" :key="item.word + item.type">{{item.word}}</el-tag>
                           </div>
                         </div>
                       </div>
@@ -70,12 +90,15 @@
                     <div class="dialog-footer">
                       <el-button :loading="btnLoading" type="primary" @click="onSubmit" :disabled="saved">保存标引词</el-button>
                     </div>
+                    <div>
+                      <el-row><el-button-group size="small"  class="prev-next-btn"><el-button type="primary" plain @click="prevZKPatnet" class="prev-patent" icon="el-icon-arrow-left">上一篇</el-button><el-button type="primary" plain  @click="nextZKPatent" class="next-patent">下一篇<i class="el-icon-arrow-right el-icon--right"></i></el-button></el-button-group></el-row>
+                    </div>
                   </div>
                 </el-col>
                 <el-col :span="12" class="patent-detail">
                   <div class="portlet">
                     <div class="portlet-body">
-                      <div class="patent-scroll" v-if="currentPatent">
+                      <div class="patent-scroll" v-if="currentPatent" style="overflow-x: hidden;height:550px;">
                         <div class="patent-item">
                           <label>申请号:</label>
                           <div class="content">{{currentPatent.Ap}}</div>
@@ -150,19 +173,19 @@
       currentPatent () {
         return this.zkPatentListResult[this.index]
       },
-      tiWords () {
+      ZKTiWords () {
         let marks = this.zkmarkList
         if (!marks) {
           return []
         }
-        return marks.filter(mark => mark.type === 1)
+        return marks.filter(mark => Number(mark.type) === 1)
       },
       clmsWords () {
         let marks = this.zkmarkList
         if (!marks) {
           return []
         }
-        return marks.filter(mark => mark.type === 2)
+        return marks.filter(mark => Number(mark.type) === 2)
       },
       saved () {
         let flag = true
@@ -185,12 +208,106 @@
         'searchZKPatentDetail',
         'searchZKTiChaiCi',
         'addZKMark',
-        'showZKMarkList'
+        'showZKMarkList',
+        'searchZKPatentDetailUnion',
+        'searchZKPatentFormTwo'
       ]),
+      prevZKPatnet () {
+        if (this.index === 0) {
+          alert('已经是第一篇文献了')
+          this.message = `已经是第一篇文献了:${+new Date()}`
+        } else {
+          this.activeNames=['1']
+          this.message = ''
+          this.patentLoading = true
+          this.index = this.index - 1
+         // console.log(this.index)
+          var an = this.zkPatentListResult[this.index].Ap
+          var title=this.currentPatent.TI
+          this.searchZKPatentDetailUnion({an,title}).then(() => {
+            this.patentLoading = false
+          })
+        }
+      },
+      nextZKPatent () {
+        if (this.index === this.zkPatentListResult.length - 1) {
+          alert('已经是最后一篇文献了')
+          this.message = `已经是最后一篇文献了:${+new Date()}`
+        } else {
+          this.activeNames=['1']
+          this.message = ''
+          this.patentLoading = true
+          this.index = this.index + 1
+          var an = this.zkPatentListResult[this.index].Ap
+          var title=this.currentPatent.TI
+          this.searchZKPatentDetailUnion({an,title}).then(() => {
+            this.patentLoading = false
+          })
+        }
+      },
+      openDetails (row) {
+        this.index = row.index
+        this.activeNames=['1']
+        this.patentLoading = true
+        var an = row.Ap
+        var title=row.TI
+        this.searchZKPatentDetailUnion({an,title}).then(() => {
+          this.patentLoading = false
+        })
+      },
+      tableRowClassName ({row, rowIndex}) {
+        row.index = rowIndex
+      },
+      selectHighLight ({row, rowIndex}) {
+        if (this.index === rowIndex) {
+          return {
+            'background-color': '#d9edf7',
+            'cursor': 'pointer'
+          }
+        }
+      },
+      clickZKPagination (curPage) {
+        console.log(curPage)
+        console.log((curPage - 1) * this.pagination.size)
+        this.patentLoading = true
+        this.index=0
+        this.activeNames=['1']
+        this.searchZKPatentFormTwo({
+          size: this.pagination.size,
+          start: (curPage - 1) * this.pagination.size
+        }).then(() => {
+          var an = this.currentPatent.Ap
+          var title=this.currentPatent.TI
+          //console.log("title"+ title)
+          this.searchZKPatentDetailUnion({an,title}).then(() => {
+            this.patentLoading = false
+          })
+        })
+      },
+      addMarkTi () {
+        let marks = this.zkmarkList
+        this.ZKchaiCiList.forEach(mark => {
+          let  m = Object.create(null)
+          m['type'] = '1'
+          m['word'] = mark['word']
+          marks.push(m)
+        })
+        //console.log(marks)
+      },
+      addMarkClms () {
+        let marks = this.zkmarkList
+        this.ClmsChaici.forEach(mark => {
+          let  m = Object.create(null)
+          m['type'] = '2'
+          m['word'] = mark['word']
+          marks.push(m)
+        })
+        //console.log(marks)
+      },
       onSubmit () {
         this.btnLoading = true
         var ap=this.currentPatent.Ap
-        console.log('ap'+ ap)
+        //console.log('ap'+ ap)
         var markList=this.zkmarkList
         let marks = []
         markList.forEach(mark => {
@@ -255,39 +372,7 @@
         })
       },
       closeMark (mark) {
-        if (!mark.id) {
-          this.zkmarkList.splice(this.zkmarkList.indexOf(mark), 1)
-          return
-        }
-        this.$confirm('此操作将删除该标引词, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.deleteZKMark(mark.id).then((data) => {
-            if (data.flag) {
-              this.$message({
-                type: 'success',
-                message: '删除成功!'
-              })
-              this.showZKMarkList(currentPatent.Ap).then(() => {
-                if (this.zkmarkList.length === 0) {
-                  alert("没有标引词");
-                }
-              })
-            } else {
-              this.$message({
-                type: 'error',
-                message: '删除失败!'
-              })
-            }
-          })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
+        this.zkmarkList.splice(this.zkmarkList.indexOf(mark), 1)
       }
     },
     components: {
@@ -297,11 +382,16 @@
       this.pageLoading = true
       this.searchZKPatent().then(() => {
         var an = this.zkPatentListResult[this.index].Ap
-        this.searchZKPatentDetail({an}).then(() => {
+        /*this.searchZKPatentDetail({an}).then(() => {
           var title=this.currentPatent.TI
           this.searchZKTiChaiCi(title).then(() => {
             this.pageLoading = false
           })
+        })*/
+        var title=this.currentPatent.TI
+        console.log("title"+ title)
+        this.searchZKPatentDetailUnion({an,title}).then(() => {
+          this.pageLoading = false
         })
       })
       next()
@@ -313,12 +403,18 @@
         this.pageLoading = false
         if(this.zkPatentListResult.length != 0) {
           var an = this.zkPatentListResult[0].Ap
-          this.searchZKPatentDetail({an}).then(() => {
+         /* this.searchZKPatentDetail({an}).then(() => {
             var title=this.currentPatent.TI
             this.searchZKTiChaiCi(title).then(() => {
               this.patentLoading = false
               this.pageLoading = false
             })
+          })*/
+          var title=this.zkPatentListResult[0].TI
+          console.log("title"+ title)
+          this.searchZKPatentDetailUnion({an,title}).then(() => {
+            this.patentLoading = false
+            this.pageLoading = false
           })
         }
       })

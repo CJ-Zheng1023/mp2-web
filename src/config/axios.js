@@ -2,7 +2,7 @@ import axios from 'axios'
 import GLOBAL from './global'
 import Vue from 'vue'
 import router from '../router/index'
-axios.defaults.timeout = 20000
+axios.defaults.timeout = 40000
 axios.defaults.baseURL = GLOBAL.BACK_END_URL
 axios.interceptors.response.use(
   response => {

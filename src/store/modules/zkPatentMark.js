@@ -62,7 +62,6 @@ export default {
     },
     addZKMark ({commit, dispatch}, {marks, an}) {
       let markList = JSON.parse(JSON.stringify(marks))
-      console.log('an' + an)
       return new Promise((resolve, reject) => {
         axios({
           url: MODULE_CONTEXT + '/keyword/save',
@@ -84,8 +83,34 @@ export default {
     showZKMarkList ({commit}, an) {
       return new Promise((resolve, reject) => {
         axios.get(MODULE_CONTEXT + `/keyword/search/${an}?token=${window.localStorage.getItem('token')}`).then(response => {
-          // axios.get(MODULE_CONTEXT + `/list/A08?token=${window.localStorage.getItem('token')}`).then(response => {
           commit('showZKMarkList', response.data)
+          resolve()
+        }).catch(e => {
+          console.log(e)
+        })
+      })
+    },
+    searchZKPatentDetailUnion ({commit}, {an, title}) {
+      // console.log('title111' + title)
+      return new Promise((resolve, reject) => {
+        axios.all([
+          axios.get(MODULE_CONTEXT + `/patent/search/${an}?token=${window.localStorage.getItem('token')}`),
+          axios.get(MODULE_CONTEXT + `/keyword/search/${an}?token=${window.localStorage.getItem('token')}`),
+          axios.get(MODULE_CONTEXT + `/chaici/list/${title}?token=${window.localStorage.getItem('token')}`)
+        ]).then(axios.spread((patentDetailResponse, markListResponse, chaiCiResponse) => {
+          commit('ZKPatentDetailMutation', patentDetailResponse.data)
+          commit('showZKMarkList', markListResponse.data)
+          commit('showZKTiChaiCiMutation', chaiCiResponse.data)
+          resolve()
+        })).catch(e => {
+          console.log(e)
+        })
+      })
+    },
+    searchZKPatentFormTwo ({commit}, {start, size}) {
+      return new Promise((resolve, reject) => {
+        axios.get(MODULE_CONTEXT + `/patent/search/list?start=${start}&size=${size}&token=${window.localStorage.getItem('token')}`).then(response => {
+          commit('ZKPatentListMutation', response.data)
           resolve()
         }).catch(e => {
           console.log(e)
