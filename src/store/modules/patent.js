@@ -7,7 +7,15 @@ export default {
       compResult: '',
       pagination: '',
       selfpatentBaseInfo: '',
-      citepatentBaseInfo: ''
+      citepatentBaseInfo: '',
+      patentChaiCiTi: '',
+      citedChaiCiTi: '',
+      patentCLMSChaiCiTi: '',
+      patentDESCChaiCiTi: '',
+      citedCLMSChaiCiTi: '',
+      citedDESCChaiCiTi: '',
+      patentMarkList: '',
+      citedPatentMarkList: ''
     }
   },
   mutations: {
@@ -18,6 +26,16 @@ export default {
     searchCompDetail (state, data) {
       state.selfpatentBaseInfo = data.thispatentBaseInfo
       state.citepatentBaseInfo = data.citepatentBaseInfo
+      state.patentChaiCiTi = data.patentChaiCiTi
+      state.citedChaiCiTi = data.citedChaiCiTi
+      state.patentCLMSChaiCiTi = data.patentCLMSChaiCiTi
+      state.patentDESCChaiCiTi = data.patentDESCChaiCiTi
+      state.citedCLMSChaiCiTi = data.citedCLMSChaiCiTi
+      state.citedDESCChaiCiTi = data.citedDESCChaiCiTi
+    },
+    showPatentMarkList (state, data) {
+      state.patentMarkList = data.patentMarkList
+      state.citedPatentMarkList = data.citedPatentMarkList
     }
   },
   actions: {
@@ -46,6 +64,50 @@ export default {
         axios.get(MODULE_CONTEXT + `/search/list/${an}/${citedAn}?token=${window.localStorage.getItem('token')}`).then(response => {
           commit('searchCompDetail', response.data)
           resolve()
+        }).catch(e => {
+          console.log(e)
+        })
+      })
+    },
+    showPatentMarkList ({commit}, {an, citedAn}) {
+      return new Promise((resolve, reject) => {
+        axios.get(MODULE_CONTEXT + `/keyword/search/${an}/${citedAn}?token=${window.localStorage.getItem('token')}`).then(response => {
+          commit('showPatentMarkList', response.data)
+          resolve()
+        }).catch(e => {
+          console.log(e)
+        })
+      })
+    },
+    searchPatentDetailUnion ({commit}, {an, citedAn}) {
+      return new Promise((resolve, reject) => {
+        axios.all([
+          axios.get(MODULE_CONTEXT + `/search/list/${an}/${citedAn}?token=${window.localStorage.getItem('token')}`),
+          axios.get(MODULE_CONTEXT + `/keyword/search/${an}/${citedAn}?token=${window.localStorage.getItem('token')}`)
+        ]).then(axios.spread((patentDetailResponse, markListResponse) => {
+          commit('searchCompDetail', patentDetailResponse.data)
+          commit('showPatentMarkList', markListResponse.data)
+          resolve()
+        })).catch(e => {
+          console.log(e)
+        })
+      })
+    },
+    addPatentMarks ({commit, dispatch}, {marks, citedmarks}) {
+      let markList = JSON.parse(JSON.stringify(marks))
+      return new Promise((resolve, reject) => {
+        axios({
+          url: MODULE_CONTEXT + '/keyword/save',
+          method: 'post',
+          data: {
+            markList: JSON.stringify(markList),
+            citedMarkList: JSON.stringify(citedmarks)
+          },
+          params: {
+            token: window.localStorage.getItem('token')
+          }
+        }).then(response => {
+          resolve(response.data)
         }).catch(e => {
           console.log(e)
         })

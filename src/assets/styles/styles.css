@@ -67,3 +67,9 @@ body{
   width: 90px;
   color: #99a9bf;
 }
+.el-collapse-item__header {
+  font-size: 14px;
+  font-weight: bold;
+  color:darkblue;
+}
+

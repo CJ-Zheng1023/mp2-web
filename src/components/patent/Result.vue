@@ -11,12 +11,12 @@
               <el-table
                 :data="compResult"
                 border
-                style="width: 100%;" @row-click="openDetails" :row-class-name="tableRowClassName" :row-style="selectHighLight" :header-cell-style="{'background-color': '#FFCA28','color': 'black','text-align':'center'}" >
-                <el-table-column prop="apoldAn" label="申请号" width="160" class="table-item"></el-table-column>
+                style="width: 100%;" @row-click="openDetails" :row-class-name="tableRowClassName" :row-style="selectHighLight" :header-cell-style="{'background-color': '#9999D1','color': '#5E5E5E','text-align':'left','opacity': '0.7'}" >
+                <el-table-column prop="apoldAn" label="申请号" width="154" class="table-item"></el-table-column>
                 <el-table-column  label="对比文献">
-                  <el-table-column prop="citedAn" label="申请号" width="160" class="table-item"></el-table-column>
-                  <el-table-column prop="citeType" label="类型" width="153" class="table-item"></el-table-column>
-              <!--    <el-table-column prop="location" label="排名" width="61" class="table-item"></el-table-column>-->
+                  <el-table-column prop="citedAn" label="申请号" width="145" class="table-item"></el-table-column>
+                  <el-table-column prop="citeType" label="类型" width="33" class="table-item"></el-table-column>
+                  <el-table-column prop="location" label="排名" width="61" class="table-item"></el-table-column>
                 </el-table-column>
               </el-table>
             </el-row>
@@ -44,7 +44,6 @@
         </el-col>
         <el-col :span="17" v-if="compResult.length !=0">
           <div class="patent-detail" v-loading="patentLoading">
-            <el-row><el-button-group class="prev-next-btn"><el-button type="primary" plain  @click="prev" class="prev-patent" icon="el-icon-arrow-left">上一篇</el-button><el-button type="primary" plain  @click="next" class="next-patent">下一篇<i class="el-icon-arrow-right el-icon--right"></i></el-button></el-button-group></el-row>
             <div class="comp-main">
               <el-row :gutter="20">
                 <el-col :span="12" class="selfpatentBaseInfo">
@@ -63,7 +62,7 @@
                             <label>分类号:</label>
                             <div class="content"  v-if="this.compResult[this.index]">{{this.compResult[this.index].apIpc}}</div>
                           </div>
-                          <div class="patent-item">
+                          <!--<div class="patent-item">
                             <label>发明人:</label>
                             <div class="content">{{this.selfpatentBaseInfo.IN}}</div>
                           </div>
@@ -74,26 +73,81 @@
                           <div class="patent-item">
                             <label>国省代码:</label>
                             <div class="content">{{this.selfpatentBaseInfo.CNAME}}</div>
-                          </div>
+                          </div>-->
                         </div>
                       </div>
                       <div class="grid-content bg-purple">
                         <el-collapse v-model="activeNames" accordion>
-                          <el-collapse-item title="发明名称" name="1">
-                            <div v-html="this.selfpatentBaseInfo.TI">
-                            </div>
-                          </el-collapse-item>
-                          <el-collapse-item title="权利要求" name="3">
-                            <div v-html="selfpatentBaseInfo.CLIMS"></div>
-                          </el-collapse-item>
-                          <el-collapse-item title="摘要" name="4">
+                          <div>
+                            <el-collapse-item title="发明名称" name="1">
+                              <div class="patent-item">
+                                <label>发明名称:</label>
+                                <div class="content" tabindex='-1' @keyup.18="markPatentWord(1, $event)"  v-html="this.selfpatentBaseInfo.TI"></div>
+                              </div>
+                              <div class="refer">
+                                <i class="el-icon-star-off"></i><label>标题拆词参考:</label>
+                                <el-button type="primary" plain size="mini" @click="addPatentMark(1)" style="float: right">添加</el-button>
+                              </div>
+                              <div>
+                                <p>
+                                  <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" class="mark-item"  v-for="item in patentChaiCiTi" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
+                                </p>
+                              </div>
+                              <div >标题拆词如下:</div>
+                              <div style="min-height: 50px;margin-top:10px;">
+                                <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'"  class="mark-item" @close="closePatentMark(item)" :closable="true"  v-for="item in patentTiWords" :key="item.word + item.type">{{item.word}}</el-tag>
+                              </div>
+                            </el-collapse-item>
+                          </div>
+                          <div>
+                            <el-collapse-item title="权利要求" name="3">
+                              <div class="marks-scroll patent-height">
+                                <div class="marks">
+                                  <div class="refer">
+                                    <i class="el-icon-star-off"></i><label>权力要求拆词参考:</label>
+                                    <el-button type="primary" plain size="mini" @click="addPatentCMLSMark(2)" style="float: right">添加</el-button>
+                                  </div>
+                                  <div>
+                                    <p>
+                                      <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" class="mark-item"  v-for="item in patentCLMSChaiCiTi" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
+                                    </p>
+                                  </div>
+                                  <div >权力要求拆词如下:</div>
+                                  <div style="min-height: 50px;margin-top:10px;">
+                                    <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'"  class="mark-item" @close="closePatentMark(item)" :closable="true" v-for="item in patentCLMSWords" :key="item.word + item.type">{{item.word}}</el-tag>
+                                  </div>
+                                  <div class="clearfocusoutline" tabindex='-1' @keyup.18="markPatentWord(2, $event)" v-html="selfpatentBaseInfo.CLIMS"></div>
+                                </div>
+                              </div>
+                            </el-collapse-item>
+                          </div>
+                        <!--  <el-collapse-item title="摘要" name="4">
                             <div v-html="this.selfpatentBaseInfo.AB">
                             </div>
-                          </el-collapse-item>
-                          <el-collapse-item title="说明书" name="2">
-                            <div v-html="selfpatentBaseInfo.DESC">
-                            </div>
-                          </el-collapse-item>
+                          </el-collapse-item>-->
+                          <div>
+                              <el-collapse-item title="说明书" name="2">
+                                <div class="marks-scroll patent-height">
+                                  <div class="marks">
+                                    <div class="refer">
+                                      <i class="el-icon-star-off"></i><label>说明书拆词参考:</label>
+                                      <el-button type="primary" plain size="mini" @click="addPatentDESCMark(3)" style="float: right">添加</el-button>
+                                    </div>
+                                    <div>
+                                      <p>
+                                        <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" class="mark-item"  v-for="item in patentDESCChaiCiTi" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
+                                      </p>
+                                    </div>
+                                    <div >说明书拆词如下:</div>
+                                    <div style="min-height: 50px;margin-top:10px;">
+                                      <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'"  class="mark-item" @close="closePatentMark(item)" :closable="true"  v-for="item in patentDESCWords" :key="item.word + item.type">{{item.word}}</el-tag>
+                                    </div>
+                                    <div class="clearfocusoutline" tabindex='-1' @keyup.18="markPatentWord(3, $event)"  v-html="selfpatentBaseInfo.DESC">
+                                    </div>
+                                  </div>
+                                </div>
+                              </el-collapse-item>
+                          </div>
                         </el-collapse>
                       </div>
                     </div>
@@ -115,7 +169,7 @@
                             <label>分类号:</label>
                             <div class="content">{{this.compResult[this.index].cIpc}}</div>
                           </div>
-                          <div class="patent-item">
+                         <!-- <div class="patent-item">
                             <label>发明人:</label>
                             <div class="content">{{this.citepatentBaseInfo.IN}}</div>
                           </div>
@@ -126,24 +180,80 @@
                           <div class="patent-item">
                             <label>国省代码:</label>
                             <div class="content">{{this.citepatentBaseInfo.CNAME}}</div>
-                          </div>
+                          </div>-->
                         </div>
                       </div>
                       <div class="grid-content bg-purple-light">
                         <el-collapse v-model="activeNames" accordion>
-                          <el-collapse-item title="发明名称" name="1" class="collapse-title">
-                            <div v-html="this.citepatentBaseInfo.TI"></div>
-                          </el-collapse-item>
-                          <el-collapse-item title="权利要求" name="3">
-                            <div v-html="this.citepatentBaseInfo.CLIMS"></div>
-                          </el-collapse-item>
-                          <el-collapse-item title="摘要" name="4">
+                          <div>
+                            <el-collapse-item title="发明名称" name="1" class="collapse-title">
+                              <div class="patent-item">
+                                <label>发明名称:</label>
+                                <div class="content" tabindex='-1' @keyup.18="markCitedPatentWord(1, $event)"  v-html="this.citepatentBaseInfo.TI"></div>
+                              </div>
+                              <div class="refer">
+                                <i class="el-icon-star-off"></i><label>标题拆词参考:</label>
+                                <el-button type="primary" plain size="mini" @click="addCitedPatentMark(1)"  style="float: right">添加</el-button>
+                              </div>
+                              <div>
+                                <p>
+                                  <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" class="mark-item"  v-for="item in citedChaiCiTi" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
+                                </p>
+                              </div>
+                              <div >标题拆词如下:</div>
+                              <div style="min-height: 50px;margin-top:10px;">
+                                <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'"  class="mark-item" @close="closeCitedPatentMark(item)" :closable="true"  v-for="item in citedPatentTiWords" :key="item.word + item.type">{{item.word}}</el-tag>
+                              </div>
+                            </el-collapse-item>
+                          </div>
+                          <div>
+                            <el-collapse-item title="权利要求" name="3">
+                              <div class="marks-scroll patent-height">
+                                <div class="marks">
+                                  <div class="refer">
+                                    <i class="el-icon-star-off"></i><label>权力要求拆词参考:</label>
+                                    <el-button type="primary" plain size="mini" @click="addCitedPatentCMLSMark(2)" style="float: right">添加</el-button>
+                                  </div>
+                                  <div>
+                                    <p>
+                                      <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" class="mark-item"  v-for="item in citedCLMSChaiCiTi" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
+                                    </p>
+                                  </div>
+                                  <div >权力要求拆词如下:</div>
+                                  <div style="min-height: 50px;margin-top:10px;">
+                                    <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'"  class="mark-item" @close="closeCitedPatentMark(item)" :closable="true"  v-for="item in citedPatentCLMSWords" :key="item.word + item.type">{{item.word}}</el-tag>
+                                  </div>
+                                  <div class="clearfocusoutline" tabindex='-1' @keyup.18="markCitedPatentWord(2, $event)"  v-html="this.citepatentBaseInfo.CLIMS"></div>
+                                </div>
+                              </div>
+                            </el-collapse-item>
+                          </div>
+                         <!-- <el-collapse-item title="摘要" name="4">
                             <div v-html="this.citepatentBaseInfo.AB">
                             </div>
-                          </el-collapse-item>
-                          <el-collapse-item title="说明书" name="2">
-                            <div v-html="this.citepatentBaseInfo.DESC"></div>
-                          </el-collapse-item>
+                          </el-collapse-item>-->
+                          <div>
+                            <el-collapse-item title="说明书" name="2">
+                              <div class="marks-scroll patent-height">
+                                <div class="marks">
+                                  <div class="refer">
+                                    <i class="el-icon-star-off"></i><label>说明书拆词参考:</label>
+                                    <el-button type="primary" plain size="mini" @click="addCitedPatentDESCMark(3)" style="float: right">添加</el-button>
+                                  </div>
+                                  <div>
+                                    <p>
+                                      <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" class="mark-item"  v-for="item in citedDESCChaiCiTi" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
+                                    </p>
+                                  </div>
+                                  <div >说明书拆词如下:</div>
+                                  <div style="min-height: 50px;margin-top:10px;">
+                                    <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'"  class="mark-item" @close="closeCitedPatentMark(item)" :closable="true"  v-for="item in citedPatentDESCWords" :key="item.word + item.type">{{item.word}}</el-tag>
+                                  </div>
+                                  <div class="clearfocusoutline" tabindex='-1' @keyup.18="markCitedPatentWord(3, $event)" v-html="this.citepatentBaseInfo.DESC"></div>
+                                </div>
+                              </div>
+                            </el-collapse-item>
+                          </div>
                         </el-collapse>
                       </div>
                     </div>
@@ -155,6 +265,10 @@
                   </el-card>
                 </el-col>
               </el-row>
+              <div >
+                <el-button :loading="btnLoading" type="primary" @click="onSubmit" :disabled="saved">保存标引词</el-button>
+                <el-button-group class="prev-next-btn"><el-button type="primary" plain  @click="prev" class="prev-patent" icon="el-icon-arrow-left">上一篇</el-button><el-button type="primary" plain  @click="next" class="next-patent">下一篇<i class="el-icon-arrow-right el-icon--right"></i></el-button></el-button-group>
+              </div>
             </div>
           </div>
         </el-col>
@@ -179,7 +293,8 @@ export default {
       pageLoading: false,
       activeNames: ['1'],
       index: 0,
-      message: ''
+      message: '',
+      btnLoading: false
     }
   },
   computed: {
@@ -191,8 +306,58 @@ export default {
       'compResult',
       'pagination',
       'selfpatentBaseInfo',
-      'citepatentBaseInfo'
+      'citepatentBaseInfo',
+      'patentChaiCiTi',
+      'citedChaiCiTi',
+      'patentCLMSChaiCiTi',
+      'patentDESCChaiCiTi',
+      'citedCLMSChaiCiTi',
+      'citedDESCChaiCiTi',
+      'patentMarkList',
+      'citedPatentMarkList'
     ]),
+    patentTiWords () {
+      let marks = this.patentMarkList
+      if (!marks) {
+        return []
+      }
+      return marks.filter(mark => Number(mark.type) === 1)
+    },
+    patentCLMSWords () {
+      let marks = this.patentMarkList
+      if (!marks) {
+        return []
+      }
+      return marks.filter(mark => Number(mark.type) === 2)
+    },
+    patentDESCWords () {
+      let marks = this.patentMarkList
+      if (!marks) {
+        return []
+      }
+      return marks.filter(mark => Number(mark.type) === 3)
+    },
+    citedPatentTiWords () {
+      let marks = this.citedPatentMarkList
+      if (!marks) {
+        return []
+      }
+      return marks.filter(mark => Number(mark.type) === 1)
+    },
+    citedPatentCLMSWords () {
+      let marks = this.citedPatentMarkList
+      if (!marks) {
+        return []
+      }
+      return marks.filter(mark => Number(mark.type) === 2)
+    },
+    citedPatentDESCWords () {
+      let marks = this.citedPatentMarkList
+      if (!marks) {
+        return []
+      }
+      return marks.filter(mark => Number(mark.type) === 3)
+    },
     selfCLMS () {
       let clmsStr = this.selfpatentBaseInfo.CLIMS
       return this._formatCLMS(clmsStr)
@@ -200,9 +365,83 @@ export default {
     citeCLMS () {
       let clmsStr = this.citepatentBaseInfo.CLIMS
       return this._formatCLMS(clmsStr)
+    },
+    saved () {
+      let flag = true
+      if (!this.patentMarkList || !this.citedPatentMarkList) {
+        return flag
+      }
+      let patentflag =true
+      for (let i = 0, length = this.patentMarkList.length; i < length; i++) {
+        let item = this.patentMarkList[i]
+        if (!item.an) {
+          patentflag = false
+          break
+        }
+      }
+      let citedflag =true
+      for (let i = 0, length = this.citedPatentMarkList.length; i < length; i++) {
+        let item = this.citedPatentMarkList[i]
+        if (!item.an) {
+          citedflag = false
+          break
+        }
+      }
+      if (citedflag==false && patentflag==false) {
+        return false
+      } else {
+        return true
+      }
     }
   },
   methods: {
+    onSubmit () {
+      this.btnLoading = true
+      var an = this.compResult[0].an
+      var citedAn = this.compResult[0].citedAn === '' ? '1' : this.compResult[0].citedAn
+      var patentmarkList=this.patentMarkList
+      var citedpatentmarkList=this.citedPatentMarkList
+      let marks = []
+      patentmarkList.forEach(mark => {
+        let  m = Object.create(null)
+        m['an'] = an
+        m['type'] = mark['type']
+        m['word'] = mark['word']
+        marks.push(m)
+      })
+      let citedmarks = []
+      citedpatentmarkList.forEach(mark => {
+        let  m = Object.create(null)
+        m['an'] = citedAn
+        m['type'] = mark['type']
+        m['word'] = mark['word']
+        citedmarks.push(m)
+      })
+      this.addPatentMarks({marks,citedmarks}).then(data => {
+        if (data.flag) {
+          this.$alert('添加成功', '提示', {
+            confirmButtonText: '确定',
+            type: 'success'
+          }).then(action => {
+            this.loading = true
+            this.showPatentMarkList({
+              an: an,
+              citedAn: citedAn
+            }).then(() => {
+              this.loading = false
+              this.btnLoading = false
+            })
+          })
+        } else {
+          this.$alert('添加失败', '提示', {
+            confirmButtonText: '确定',
+            type: 'error'
+          }).then(action => {
+            this.btnLoading = false
+          })
+        }
+      })
+    },
     _formatCLMS (origin) {
       let html = origin || ''
       let number = html.match(/[0-9]+[.]/g)
@@ -232,10 +471,7 @@ export default {
       }).then(() => {
         var an = this.compResult[0].an
         var citedAn = this.compResult[0].citedAn === '' ? '1' : this.compResult[0].citedAn
-        this.searchAnDetail({
-          an: an,
-          citedAn: citedAn
-        }).then(() => {
+        this.searchPatentDetailUnion({an,citedAn}).then(() => {
           this.patentLoading = false
         })
       })
@@ -246,10 +482,7 @@ export default {
       var an = row.an
       var citedAn = row.citedAn === '' ? '1' : row.citedAn
       this.patentLoading = true
-      this.searchAnDetail({
-        an: an,
-        citedAn: citedAn
-      }).then(() => {
+      this.searchPatentDetailUnion({an,citedAn}).then(() => {
         this.patentLoading = false
       })
     },
@@ -264,10 +497,7 @@ export default {
         this.index = this.index - 1
         var an = this.compResult[this.index].an
         var citedAn = this.compResult[this.index].citedAn === '' ? '1' : this.compResult[this.index].citedAn
-        this.searchAnDetail({
-          an: an,
-          citedAn: citedAn
-        }).then(() => {
+        this.searchPatentDetailUnion({an,citedAn}).then(() => {
           this.patentLoading = false
         })
       }
@@ -283,10 +513,7 @@ export default {
         this.index = this.index + 1
         var an = this.compResult[this.index].an
         var citedAn = this.compResult[this.index].citedAn === '' ? '1' : this.compResult[this.index].citedAn
-        this.searchAnDetail({
-          an: an,
-          citedAn: citedAn
-        }).then(() => {
+        this.searchPatentDetailUnion({an,citedAn}).then(() => {
           this.patentLoading = false
         })
       }
@@ -299,10 +526,128 @@ export default {
         }
       }
     },
+    addPatentMark (type) {
+      let marks = this.patentMarkList
+      this.patentChaiCiTi.forEach(mark => {
+        let  m = Object.create(null)
+        m['type'] = type
+        m['word'] = mark['word']
+        marks.push(m)
+      })
+    },
+    addPatentCMLSMark (type) {
+      let marks = this.patentMarkList
+      this.patentCLMSChaiCiTi.forEach(mark => {
+        let  m = Object.create(null)
+        m['type'] = type
+        m['word'] = mark['word']
+        marks.push(m)
+      })
+    },
+    addPatentDESCMark (type) {
+      let marks = this.patentMarkList
+      this.patentDESCChaiCiTi.forEach(mark => {
+        let  m = Object.create(null)
+        m['type'] = type
+        m['word'] = mark['word']
+        marks.push(m)
+      })
+    },
+    addCitedPatentMark (type) {
+      let marks = this.citedPatentMarkList
+      this.citedChaiCiTi.forEach(mark => {
+        let  m = Object.create(null)
+        m['type'] = type
+        m['word'] = mark['word']
+        marks.push(m)
+      })
+    },
+    addCitedPatentCMLSMark (type) {
+      let marks = this.citedPatentMarkList
+      this.citedCLMSChaiCiTi.forEach(mark => {
+        let  m = Object.create(null)
+        m['type'] = type
+        m['word'] = mark['word']
+        marks.push(m)
+      })
+    },
+    addCitedPatentDESCMark (type) {
+      let marks = this.citedPatentMarkList
+      this.citedDESCChaiCiTi.forEach(mark => {
+        let  m = Object.create(null)
+        m['type'] = type
+        m['word'] = mark['word']
+        marks.push(m)
+      })
+    },
+    _getSelectText () {
+      let text = ''
+      if (window.getSelection) {
+        text = window.getSelection().toString()
+      } else if (document.selection && document.selection.type !== 'Control') {
+        text = document.selection.createRange().text
+      }
+      return text
+    },
+    markPatentWord (type, event) {
+      let word = this._getSelectText()
+      let flag = false
+      for (let i = 0, len = this.patentMarkList.length; i < len; i++) {
+        let item = this.patentMarkList[i]
+        if (word + type === item.word + item.type) {
+          flag = true
+          break
+        }
+      }
+      if (flag) {
+        this.$alert(`${word}已添加为标引词`, '提示', {
+          confirmButtonText: '确定',
+          type: 'warning'
+        })
+        return
+      }
+      this.patentMarkList.push({
+        type,
+        word,
+        userId: window.localStorage.getItem('userId')
+      })
+    },
+    markCitedPatentWord (type, event) {
+      let word = this._getSelectText()
+      let flag = false
+      for (let i = 0, len = this.citedPatentMarkList.length; i < len; i++) {
+        let item = this.citedPatentMarkList[i]
+        if (word + type === item.word + item.type) {
+          flag = true
+          break
+        }
+      }
+      if (flag) {
+        this.$alert(`${word}已添加为标引词`, '提示', {
+          confirmButtonText: '确定',
+          type: 'warning'
+        })
+        return
+      }
+      this.citedPatentMarkList.push({
+        type,
+        word,
+        userId: window.localStorage.getItem('userId')
+      })
+    },
+    closePatentMark (mark) {
+      this.patentMarkList.splice(this.patentMarkList.indexOf(mark), 1)
+    },
+    closeCitedPatentMark (mark) {
+      this.citedPatentMarkList.splice(this.citedPatentMarkList.indexOf(mark), 1)
+    },
     ...mapActions('patentModule', [
       'searchPatentsList',
       'searchPatentListFormTwo',
-      'searchAnDetail'
+      'searchAnDetail',
+      'showPatentMarkList',
+      'searchPatentDetailUnion',
+      'addPatentMarks'
     ])
   },
   components: {
@@ -313,12 +658,9 @@ export default {
     this.searchPatentsList().then(() => {
       var an = this.compResult[0].an
       var citedAn = this.compResult[0].citedAn === '' ? '1' : this.compResult[0].citedAn
-      this.searchAnDetail({
-        an: an,
-        citedAn: citedAn
-      }).then(() => {
+      this.searchPatentDetailUnion({an,citedAn}).then(() => {
+        this.pageLoading = false
       })
-      this.pageLoading = false
     })
     next()
   },
@@ -326,18 +668,14 @@ export default {
     this.pageLoading = true
     this.patentLoading = true
     this.searchPatentsList().then(() => {
-      this.pageLoading = false
       if(this.compResult.length != 0) {
         var an = this.compResult[0].an
         var citedAn = this.compResult[0].citedAn === '' ? '1' : this.compResult[0].citedAn
-        this.searchAnDetail({
-          an: an,
-          citedAn: citedAn
-        }).then(() => {
-
+        this.searchPatentDetailUnion({an,citedAn}).then(() => {
+          this.pageLoading = false
+          this.patentLoading = false
         })
       }
-      this.patentLoading = false
     })
   }
 }
@@ -368,9 +706,9 @@ export default {
     margin-top: 10px;
     margin-left: -15px;
   }
-  .prev-next-btn{
-    float: right;
-  }
+/*  .prev-next-btn{
+    float: left;
+  }*/
   .patent-item label{
     float: left;
     padding-right: 10px;
@@ -397,27 +735,46 @@ export default {
     box-shadow: inset 0 0 10px #CCC;
   }
   .card .head{
-     background-color: #FFCA28;
+     background-color:#9999D1;
      text-align: center;
      padding:15px 20px;
      color:black;
+     opacity: 0.7;
   }
   .card .card-main{
     padding:15px 20px;
   }
-  .base{
- /*   min-height: 300px;*/
-  }
-  .card .card-main .baseinfo{
+/*  .card .card-main .baseinfo{
     min-height:280px;
     max-height:350px;
-  }
- /* .card .card-main .baseinfo{
-    min-height:100px;
   }*/
-  .el-collapse-item__header {
+  .refer label{
+    line-height: 40px;
     font-size: 14px;
     font-weight: 600;
   }
-
+  .refer{
+    padding-left:20px;
+    position: relative;
+  }
+  .refer i{
+    position: absolute;
+    left:0;
+    top:28%;
+  }
+  .patent-height{
+    overflow-y: auto;
+    max-height: 500px;
+    overflow-x: hidden;
+  }
+  .patent-item .content:focus {
+    outline: none;
+  }
+  .clearfocusoutline:focus {
+    outline: none;
+  }
+  .el-collapse{
+    border-top:none;
+    border-bottom: none;
+  }
 </style>

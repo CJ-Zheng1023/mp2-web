@@ -33,7 +33,7 @@
             </div>
           </el-card>
         </el-col>-->
-        <!--<el-col :span="6">
+        <el-col :span="6">
           <el-card :body-style="{ padding: '0px' }">
             <div class="card-header" style="background: linear-gradient(90deg, #145978, #1e769c);">
               <img src="../assets/images/card-bg.png" width="100%" />
@@ -77,7 +77,7 @@
               </router-link>
             </div>
           </el-card>
-        </el-col>-->
+        </el-col>
         <el-col :span="6">
           <el-card :body-style="{ padding: '0px' }">
             <div class="card-header" style="background: linear-gradient(90deg, #145978, #1e769c);">
