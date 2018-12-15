@@ -35,6 +35,8 @@
                 </div>
               </el-col>
             </el-row>
+            <el-row :gutter="10">
+            </el-row>
           </div>
         </el-col>
         <el-col :span="7" v-else>
@@ -62,7 +64,7 @@
                             <label>分类号:</label>
                             <div class="content"  v-if="this.compResult[this.index]">{{this.compResult[this.index].apIpc}}</div>
                           </div>
-                          <!--<div class="patent-item">
+                          <div class="patent-item">
                             <label>发明人:</label>
                             <div class="content">{{this.selfpatentBaseInfo.IN}}</div>
                           </div>
@@ -70,7 +72,7 @@
                             <label>申请人:</label>
                             <div class="content">{{this.selfpatentBaseInfo.PA}}</div>
                           </div>
-                          <div class="patent-item">
+                         <!-- <div class="patent-item">
                             <label>国省代码:</label>
                             <div class="content">{{this.selfpatentBaseInfo.CNAME}}</div>
                           </div>-->
@@ -88,14 +90,31 @@
                                 <i class="el-icon-star-off"></i><label>标题拆词参考:</label>
                                 <el-button type="primary" plain size="mini" @click="addPatentMark(1)" style="float: right">添加</el-button>
                               </div>
-                              <div>
+                              <div class="segment-refer" >
                                 <p>
-                                  <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" class="mark-item"  v-for="item in patentChaiCiTi" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
+                                  <el-tag :disable-transitions=true  :type="item.an ? 'primary' : 'primary'" class="mark-item"  v-for="item in patentChaiCiTi" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
                                 </p>
                               </div>
                               <div >标题拆词如下:</div>
                               <div style="min-height: 50px;margin-top:10px;">
-                                <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'"  class="mark-item" @close="closePatentMark(item)" :closable="true"  v-for="item in patentTiWords" :key="item.word + item.type">{{item.word}}</el-tag>
+                                <el-tag :disable-transitions=true :type="item.an ? 'primary' : 'warning'"  class="mark-item" @close="closePatentMark(item)" :closable="true"  v-for="item in patentTiWords" :key="item.word + item.type">{{item.word}}</el-tag>
+                              </div>
+                            </el-collapse-item>
+                          </div>
+                          <div>
+                            <el-collapse-item title="权利要求拆词参考" name="3">
+                              <div class="marks-scroll patent-height">
+                                <div class="marks">
+                                  <div class="refer">
+                                    <i class="el-icon-star-off"></i><label>权力要求拆词参考:</label>
+                                    <el-button type="primary" plain size="mini" @click="addPatentCMLSMark(2)" style="float: right">添加</el-button>
+                                  </div>
+                                  <div class="segment-refer">
+                                    <p>
+                                      <el-tag :disable-transitions=true :type="item.an ? 'primary' : 'primary'" class="mark-item"  v-for="item in patentCLMSChaiCiTi" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
+                                    </p>
+                                  </div>
+                                </div>
                               </div>
                             </el-collapse-item>
                           </div>
@@ -103,18 +122,9 @@
                             <el-collapse-item title="权利要求" name="3">
                               <div class="marks-scroll patent-height">
                                 <div class="marks">
-                                  <div class="refer">
-                                    <i class="el-icon-star-off"></i><label>权力要求拆词参考:</label>
-                                    <el-button type="primary" plain size="mini" @click="addPatentCMLSMark(2)" style="float: right">添加</el-button>
-                                  </div>
-                                  <div>
-                                    <p>
-                                      <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" class="mark-item"  v-for="item in patentCLMSChaiCiTi" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
-                                    </p>
-                                  </div>
                                   <div >权力要求拆词如下:</div>
                                   <div style="min-height: 50px;margin-top:10px;">
-                                    <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'"  class="mark-item" @close="closePatentMark(item)" :closable="true" v-for="item in patentCLMSWords" :key="item.word + item.type">{{item.word}}</el-tag>
+                                    <el-tag :disable-transitions=true :type="item.an ? 'primary' : 'warning'"  class="mark-item" @close="closePatentMark(item)" :closable="true" v-for="item in patentCLMSWords" :key="item.word + item.type">{{item.word}}</el-tag>
                                   </div>
                                   <div class="clearfocusoutline" tabindex='-1' @keyup.18="markPatentWord(2, $event)" v-html="selfpatentBaseInfo.CLIMS"></div>
                                 </div>
@@ -126,21 +136,29 @@
                             </div>
                           </el-collapse-item>-->
                           <div>
+                            <el-collapse-item title="说明书拆词参考" name="2">
+                              <div class="marks-scroll patent-height">
+                                <div class="marks">
+                                  <div class="refer">
+                                    <i class="el-icon-star-off"></i><label>说明书拆词参考:</label>
+                                    <el-button type="primary" plain size="mini" @click="addPatentDESCMark(3)" style="float: right">添加</el-button>
+                                  </div>
+                                  <div class="segment-refer">
+                                    <p>
+                                      <el-tag :disable-transitions=true :type="item.an ? 'primary' : 'primary'" class="mark-item"  v-for="item in patentDESCChaiCiTi" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </el-collapse-item>
+                          </div>
+                          <div>
                               <el-collapse-item title="说明书" name="2">
                                 <div class="marks-scroll patent-height">
                                   <div class="marks">
-                                    <div class="refer">
-                                      <i class="el-icon-star-off"></i><label>说明书拆词参考:</label>
-                                      <el-button type="primary" plain size="mini" @click="addPatentDESCMark(3)" style="float: right">添加</el-button>
-                                    </div>
-                                    <div>
-                                      <p>
-                                        <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" class="mark-item"  v-for="item in patentDESCChaiCiTi" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
-                                      </p>
-                                    </div>
                                     <div >说明书拆词如下:</div>
                                     <div style="min-height: 50px;margin-top:10px;">
-                                      <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'"  class="mark-item" @close="closePatentMark(item)" :closable="true"  v-for="item in patentDESCWords" :key="item.word + item.type">{{item.word}}</el-tag>
+                                      <el-tag :disable-transitions=true :type="item.an ? 'primary' : 'warning'"  class="mark-item" @close="closePatentMark(item)" :closable="true"  v-for="item in patentDESCWords" :key="item.word + item.type">{{item.word}}</el-tag>
                                     </div>
                                     <div class="clearfocusoutline" tabindex='-1' @keyup.18="markPatentWord(3, $event)"  v-html="selfpatentBaseInfo.DESC">
                                     </div>
@@ -169,7 +187,7 @@
                             <label>分类号:</label>
                             <div class="content">{{this.compResult[this.index].cIpc}}</div>
                           </div>
-                         <!-- <div class="patent-item">
+                          <div class="patent-item">
                             <label>发明人:</label>
                             <div class="content">{{this.citepatentBaseInfo.IN}}</div>
                           </div>
@@ -177,7 +195,7 @@
                             <label>申请人:</label>
                             <div class="content">{{this.citepatentBaseInfo.PA}}</div>
                           </div>
-                          <div class="patent-item">
+                          <!--<div class="patent-item">
                             <label>国省代码:</label>
                             <div class="content">{{this.citepatentBaseInfo.CNAME}}</div>
                           </div>-->
@@ -195,33 +213,41 @@
                                 <i class="el-icon-star-off"></i><label>标题拆词参考:</label>
                                 <el-button type="primary" plain size="mini" @click="addCitedPatentMark(1)"  style="float: right">添加</el-button>
                               </div>
-                              <div>
+                              <div class="segment-refer">
                                 <p>
-                                  <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" class="mark-item"  v-for="item in citedChaiCiTi" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
+                                  <el-tag :disable-transitions=true :type="item.an ? 'primary' : 'primary'" class="mark-item"  v-for="item in citedChaiCiTi" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
                                 </p>
                               </div>
                               <div >标题拆词如下:</div>
                               <div style="min-height: 50px;margin-top:10px;">
-                                <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'"  class="mark-item" @close="closeCitedPatentMark(item)" :closable="true"  v-for="item in citedPatentTiWords" :key="item.word + item.type">{{item.word}}</el-tag>
+                                <el-tag :disable-transitions=true :type="item.an ? 'primary' : 'warning'"  class="mark-item" @close="closeCitedPatentMark(item)" :closable="true"  v-for="item in citedPatentTiWords" :key="item.word + item.type">{{item.word}}</el-tag>
                               </div>
+                            </el-collapse-item>
+                          </div>
+                          <div>
+                            <el-collapse-item title="权利要求拆词参考" name="3">
+                            <div class="marks-scroll patent-height">
+                              <div class="marks">
+                                <div class="refer">
+                                  <i class="el-icon-star-off"></i><label>权力要求拆词参考:</label>
+                                  <el-button type="primary" plain size="mini" @click="addCitedPatentCMLSMark(2)" style="float: right">添加</el-button>
+                                </div>
+                                <div class="segment-refer">
+                                  <p>
+                                    <el-tag :disable-transitions=true :type="item.an ? 'primary' : 'primary'" class="mark-item"  v-for="item in citedCLMSChaiCiTi" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
                             </el-collapse-item>
                           </div>
                           <div>
                             <el-collapse-item title="权利要求" name="3">
                               <div class="marks-scroll patent-height">
                                 <div class="marks">
-                                  <div class="refer">
-                                    <i class="el-icon-star-off"></i><label>权力要求拆词参考:</label>
-                                    <el-button type="primary" plain size="mini" @click="addCitedPatentCMLSMark(2)" style="float: right">添加</el-button>
-                                  </div>
-                                  <div>
-                                    <p>
-                                      <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" class="mark-item"  v-for="item in citedCLMSChaiCiTi" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
-                                    </p>
-                                  </div>
                                   <div >权力要求拆词如下:</div>
                                   <div style="min-height: 50px;margin-top:10px;">
-                                    <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'"  class="mark-item" @close="closeCitedPatentMark(item)" :closable="true"  v-for="item in citedPatentCLMSWords" :key="item.word + item.type">{{item.word}}</el-tag>
+                                    <el-tag :disable-transitions=true :type="item.an ? 'primary' : 'warning'"  class="mark-item" @close="closeCitedPatentMark(item)" :closable="true"  v-for="item in citedPatentCLMSWords" :key="item.word + item.type">{{item.word}}</el-tag>
                                   </div>
                                   <div class="clearfocusoutline" tabindex='-1' @keyup.18="markCitedPatentWord(2, $event)"  v-html="this.citepatentBaseInfo.CLIMS"></div>
                                 </div>
@@ -233,21 +259,29 @@
                             </div>
                           </el-collapse-item>-->
                           <div>
-                            <el-collapse-item title="说明书" name="2">
+                            <el-collapse-item title="说明书拆词参考" name="2">
                               <div class="marks-scroll patent-height">
                                 <div class="marks">
                                   <div class="refer">
                                     <i class="el-icon-star-off"></i><label>说明书拆词参考:</label>
                                     <el-button type="primary" plain size="mini" @click="addCitedPatentDESCMark(3)" style="float: right">添加</el-button>
                                   </div>
-                                  <div>
+                                  <div class="segment-refer">
                                     <p>
-                                      <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" class="mark-item"  v-for="item in citedDESCChaiCiTi" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
+                                      <el-tag :disable-transitions=true :type="item.an ? 'primary' : 'primary'" class="mark-item"  v-for="item in citedDESCChaiCiTi" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
                                     </p>
                                   </div>
+                                </div>
+                              </div>
+                            </el-collapse-item>
+                          </div>
+                          <div>
+                            <el-collapse-item title="说明书" name="2">
+                              <div class="marks-scroll patent-height">
+                                <div class="marks">
                                   <div >说明书拆词如下:</div>
                                   <div style="min-height: 50px;margin-top:10px;">
-                                    <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'"  class="mark-item" @close="closeCitedPatentMark(item)" :closable="true"  v-for="item in citedPatentDESCWords" :key="item.word + item.type">{{item.word}}</el-tag>
+                                    <el-tag :disable-transitions=true :type="item.an? 'primary' : 'warning'"  class="mark-item" @close="closeCitedPatentMark(item)" :closable="true"  v-for="item in citedPatentDESCWords" :key="item.word + item.type">{{item.word}}</el-tag>
                                   </div>
                                   <div class="clearfocusoutline" tabindex='-1' @keyup.18="markCitedPatentWord(3, $event)" v-html="this.citepatentBaseInfo.DESC"></div>
                                 </div>
@@ -278,6 +312,32 @@
           </el-card>
         </el-col>
       </el-row>
+      <el-row :gutter="24">
+        <el-col :span="17" :offset="7">
+          <el-card class="box-card">
+            <div slot="header" class="clearfix">
+              <span>文本拆词: </span>
+              <template v-if="compResult[index]">
+                <el-tag type="success">本申请号:{{this.compResult[index].an}}</el-tag>
+                <el-tag type="success">对比文献申请号:{{this.compResult[index].citedAn}}</el-tag>
+                <el-tag type="success">对比文献排名:{{this.compResult[index].location}}</el-tag>
+              </template>
+              <el-button size="mini" type="primary" plain  @click="searchsortByKeywordFreqs">查询</el-button>
+            </div>
+            <el-input
+              type="textarea"
+              :autosize="{ minRows: 2, maxRows: 10}"
+              placeholder="请输入内容"
+              v-model="sortByKeywordFreqsText" style="margin-bottom:20px;">
+            </el-input>
+            <div>
+              <p>
+                <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" class="mark-item"  v-for="item in sortByKeywordFreqsList" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
+              </p>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
     </div>
   </div>
 </template>
@@ -294,7 +354,8 @@ export default {
       activeNames: ['1'],
       index: 0,
       message: '',
-      btnLoading: false
+      btnLoading: false,
+      sortByKeywordFreqsText: ''
     }
   },
   computed: {
@@ -314,7 +375,8 @@ export default {
       'citedCLMSChaiCiTi',
       'citedDESCChaiCiTi',
       'patentMarkList',
-      'citedPatentMarkList'
+      'citedPatentMarkList',
+      'sortByKeywordFreqsList'
     ]),
     patentTiWords () {
       let marks = this.patentMarkList
@@ -395,6 +457,13 @@ export default {
     }
   },
   methods: {
+    searchsortByKeywordFreqs () {
+      this.patentLoading = false
+      var text = this.sortByKeywordFreqsText
+      this.sortByKeywordFreqs({text}).then(() => {
+        this.patentLoading = false
+      })
+    },
     onSubmit () {
       this.btnLoading = true
       var an = this.compResult[0].an
@@ -647,7 +716,8 @@ export default {
       'searchAnDetail',
       'showPatentMarkList',
       'searchPatentDetailUnion',
-      'addPatentMarks'
+      'addPatentMarks',
+      'sortByKeywordFreqs'
     ])
   },
   components: {
@@ -776,5 +846,8 @@ export default {
   .el-collapse{
     border-top:none;
     border-bottom: none;
+  }
+  .segment-refer .el-tag{
+    font-weight: bold;
   }
 </style>

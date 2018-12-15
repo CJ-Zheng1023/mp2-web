@@ -15,7 +15,8 @@ export default {
       citedCLMSChaiCiTi: '',
       citedDESCChaiCiTi: '',
       patentMarkList: '',
-      citedPatentMarkList: ''
+      citedPatentMarkList: '',
+      sortByKeywordFreqsList: ''
     }
   },
   mutations: {
@@ -36,6 +37,9 @@ export default {
     showPatentMarkList (state, data) {
       state.patentMarkList = data.patentMarkList
       state.citedPatentMarkList = data.citedPatentMarkList
+    },
+    showSortByKeywords (state, data) {
+      state.sortByKeywordFreqsList = data.sortByKeywordFreqsList
     }
   },
   actions: {
@@ -107,6 +111,25 @@ export default {
             token: window.localStorage.getItem('token')
           }
         }).then(response => {
+          resolve(response.data)
+        }).catch(e => {
+          console.log(e)
+        })
+      })
+    },
+    sortByKeywordFreqs ({commit, dispatch}, {text}) {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: MODULE_CONTEXT + '/keyword/searchTextKeyword',
+          method: 'post',
+          data: {
+            text: text
+          },
+          params: {
+            token: window.localStorage.getItem('token')
+          }
+        }).then(response => {
+          commit('showSortByKeywords', response.data)
           resolve(response.data)
         }).catch(e => {
           console.log(e)
