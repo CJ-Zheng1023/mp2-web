@@ -16,7 +16,8 @@ export default {
       citedDESCChaiCiTi: '',
       patentMarkList: '',
       citedPatentMarkList: '',
-      sortByKeywordFreqsList: ''
+      sortByKeywordFreqsList: '',
+      showPatentLocationList: []
     }
   },
   mutations: {
@@ -40,6 +41,12 @@ export default {
     },
     showSortByKeywords (state, data) {
       state.sortByKeywordFreqsList = data.sortByKeywordFreqsList
+    },
+    removeFlag (state, data) {
+      state.removeErrorKeyWordFlag = data.removeErrorKeyWordFlag
+    },
+    showPatentLocation (state, data) {
+      state.showPatentLocationList = data.data
     }
   },
   actions: {
@@ -97,7 +104,7 @@ export default {
         })
       })
     },
-    addPatentMarks ({commit, dispatch}, {marks, citedmarks}) {
+    addPatentMarks ({commit, dispatch}, {an, marks, citedmarks}) {
       let markList = JSON.parse(JSON.stringify(marks))
       return new Promise((resolve, reject) => {
         axios({
@@ -105,7 +112,8 @@ export default {
           method: 'post',
           data: {
             markList: JSON.stringify(markList),
-            citedMarkList: JSON.stringify(citedmarks)
+            citedMarkList: JSON.stringify(citedmarks),
+            an: an
           },
           params: {
             token: window.localStorage.getItem('token')
@@ -131,6 +139,35 @@ export default {
         }).then(response => {
           commit('showSortByKeywords', response.data)
           resolve(response.data)
+        }).catch(e => {
+          console.log(e)
+        })
+      })
+    },
+    removeErrorKeyWords ({commit, dispatch}, {key}) {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: MODULE_CONTEXT + '/keyword/remove/key',
+          method: 'post',
+          data: {
+            errorKeyWord: key
+          },
+          params: {
+            token: window.localStorage.getItem('token')
+          }
+        }).then(response => {
+          commit('removeFlag', response.data)
+          resolve(response.data)
+        }).catch(e => {
+          console.log(e)
+        })
+      })
+    },
+    searchPatentLocation ({commit}, {an}) {
+      return new Promise((resolve, reject) => {
+        axios.get(`http://10.51.52.84:9090/sim/an?an=${an}`).then(response => {
+          commit('showPatentLocation', response.data)
+          resolve()
         }).catch(e => {
           console.log(e)
         })

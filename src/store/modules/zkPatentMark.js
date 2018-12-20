@@ -8,6 +8,7 @@ export default {
       pagination: '',
       ZKPatentDetailInfo: '',
       ClmsChaici: '',
+      DescChaici: '',
       ZKchaiCiList: '',
       zkmarkList: []
     }
@@ -20,6 +21,7 @@ export default {
     ZKPatentDetailMutation (state, data) {
       state.ZKPatentDetailInfo = data.ZKPatentDetailInfo
       state.ClmsChaici = data.ClmsChaici
+      state.DescChaici = data.DescChaici
     },
     showZKTiChaiCiMutation (state, data) {
       state.ZKchaiCiList = data.ZKchaiCiList
