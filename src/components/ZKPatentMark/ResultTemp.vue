@@ -5,15 +5,15 @@
     <div class="main">
       <div class="electrical-container" v-loading="pageLoading">
         <el-row :gutter="8">
-          <el-col :span="6" v-if="this.zkPatentListResult.length !=0">
+          <el-col :span="4" v-if="this.zkPatentListResult.length !=0">
             <div class="patent-list">
               <el-row :gutter="10">
                 <el-table
                   :data="zkPatentListResult"
                   border
                   style="width: 100%;" @row-click="openDetails" :row-class-name="tableRowClassName" :row-style="selectHighLight"  :header-cell-style="{'background-color': ' #EDEDED','color': '#5E5E5E','text-align':'center'}">
-                  <el-table-column prop="Ap" width="155" label="申请号" class="table-item"></el-table-column>
-                 <!-- <el-table-column prop="PD" width="150" label="公开日" class="table-item"></el-table-column>-->
+                  <el-table-column prop="Ap" width="78" label="申请号" class="table-item"></el-table-column>
+                  <!-- <el-table-column prop="PD" width="150" label="公开日" class="table-item"></el-table-column>-->
                   <el-table-column prop="ipcMain" label="主分类" class="table-item"></el-table-column>
                 </el-table>
               </el-row>
@@ -37,12 +37,12 @@
               </el-row>
             </div>
           </el-col>
-          <el-col :span="6" v-else>
+          <el-col :span="4" v-else>
             <el-card class="box-card">
               <p>空空如也~</p>
             </el-card>
           </el-col>
-          <el-col :span="18">
+          <el-col :span="20">
             <div class="patent-detail-warp" v-loading="patentLoading">
               <el-row :gutter="5">
                 <el-col :span="12" class="mark-title">
@@ -50,44 +50,27 @@
                     <div class="portlet-body">
                       <div class="">
                         <div class="">
-                          <div class="patent-item">
-                            <el-alert
-                              title="标题和权力要求可以通过鼠标按住Crtl键进行划词"
-                              type="warning">
-                            </el-alert>
-                            <el-alert
-                              title="增加或删除标引词一定要点击最下面的‘保存标引词’按钮才会生效"
-                              type="warning">
-                            </el-alert>
-                          </div>
-                          <div class="refer">
-                            <i class="el-icon-star-off"></i><label>标题拆词参考:</label>
-                            <!--<el-button type="primary" plain @click="addMarkTi" size="mini" style="float: right">添加</el-button>-->
-                          </div>
-                          <div>
-                            <p>
-                              <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" @close="removeErrorKeyWord(item)" :closable="true" class="mark-item"  v-for="item in ZKchaiCiList" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
-                            </p>
-                          </div>
-                          <div class="refer">
-                            <i class="el-icon-star-off"></i><label>权利要求拆词参考:</label>
-                           <!-- <el-button type="primary" plain @click="addMarkClms" size="mini" style="float: right">添加</el-button>-->
-                          </div>
-                          <div class="marks-scroll marks-height">
-                            <div class="marks">
-                              <div>
-                                <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" @close="removeErrorKeyWord(item)" :closable="true" class="mark-item"  v-for="item in ClmsChaici" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
-                              </div>
+                          <div v-if="currentPatent">
+                            <div class="patent-item">
+                              <label>申请号:</label>
+                              <div class="content">{{currentPatent.Ap}}</div>
                             </div>
-                          </div>
-                          <div class="refer">
-                            <i class="el-icon-star-off"></i><label>说明书拆词参考:</label>
-                          </div>
-                          <div class="marks-scroll marks-height">
-                            <div class="marks">
-                              <div>
-                                <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'success'" @close="removeErrorKeyWord(item)" :closable="true"  class="mark-item"  v-for="item in DescChaici" :key="item.freq + item.word">{{item.word}} :{{item.freq}}</el-tag>
-                              </div>
+                            <div class="patent-item">
+                              <label>发明名称:</label>
+                              <template>
+                                <el-radio-group v-model="patentType">
+                                  <el-radio :label="2">产品</el-radio>
+                                  <el-radio :label="1">方法</el-radio>
+                                  <el-radio :label="3">组合型</el-radio>
+                                </el-radio-group>
+                              </template>
+                              <div class="content" tabindex='-1' @keyup.18="markWord(1, $event)">{{currentPatent.TI}}</div>
+                            </div>
+                            <div class="item-title">
+                              <label>权利要求:</label>
+                            </div>
+                            <div  class="content clearfocusoutline lineheight patent-scroll-clam" tabindex='-1' @keyup.18="markWord(2, $event)">
+                              <div v-html="ZKPatentDetailInfo.CLIMS"></div>
                             </div>
                           </div>
                           <div>
@@ -110,7 +93,7 @@
                             </div>
                             <div class="marks-words">
                               <div class="refer">
-                                <i class="el-icon-star-off"></i><label>权利要求和说明书及摘要拆词如下:</label>
+                                <i class="el-icon-star-off"></i><label>权利要求和说明书拆词如下:</label>
                               </div>
                               <div style="min-height: 50px;margin-top:10px;">
                                 <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'"  @close="closeMark(item)" :closable="true"  class="mark-item"  v-for="item in clmsWords" :key="item.word + item.type">{{item.word}}</el-tag>
@@ -141,47 +124,11 @@
                   <div class="portlet">
                     <div class="portlet-body">
                       <div v-if="currentPatent">
-                        <div class="patent-item">
-                          <label>申请号:</label>
-                          <div class="content">{{currentPatent.Ap}}</div>
+                        <div class="item-title">
+                           <label>说明书:</label>
                         </div>
-                        <div class="patent-item">
-                        <label>发明名称:</label>
-                          <template>
-                            <el-radio-group v-model="patentType">
-                              <el-radio :label="2">产品</el-radio>
-                              <el-radio :label="1">方法</el-radio>
-                              <el-radio :label="3">组合型</el-radio>
-                            </el-radio-group>
-                          </template>
-                        <div class="content" tabindex='-1' @keyup.18="markWord(1, $event)">{{currentPatent.TI}}</div>
-                      </div>
-                        <div class="grid-content bg-purple">
-                          <el-collapse v-model="activeNames" accordion>
-                            <el-collapse-item title="权利要求" name="1">
-                              <div  class="content clearfocusoutline patent-scroll" tabindex='-1' @keyup.18="markWord(2, $event)">
-                                <div v-html="ZKPatentDetailInfo.CLIMS"></div>
-                              </div>
-                            </el-collapse-item>
-                          </el-collapse>
-                        </div>
-                        <div class="grid-content bg-purple">
-                          <el-collapse v-model="activeNames" accordion>
-                            <el-collapse-item title="摘要" name="2">
-                              <div  class="content clearfocusoutline patent-scroll" tabindex='-1' @keyup.18="markWord(2, $event)">
-                                <div v-html="this.zkPatentListResult[index].AB"></div>
-                              </div>
-                            </el-collapse-item>
-                          </el-collapse>
-                        </div>
-                        <div class="grid-content bg-purple">
-                          <el-collapse v-model="activeNames" accordion>
-                            <el-collapse-item title="说明书" name="3">
-                              <div  class="content clearfocusoutline patent-scroll" tabindex='-1' @keyup.18="markWord(2, $event)">
-                                <div v-html="ZKPatentDetailInfo.DESC"></div>
-                              </div>
-                            </el-collapse-item>
-                          </el-collapse>
+                        <div  class="content clearfocusoutline patent-scroll lineheight" tabindex='-1' @keyup.18="markWord(2, $event)">
+                          <div v-html="ZKPatentDetailInfo.DESC"></div>
                         </div>
                       </div>
                     </div>
@@ -483,18 +430,18 @@
       onSubmit () {
         this.btnLoading = true
         var ap=this.currentPatent.Ap
-       // var invtype=this.patentType
+        // var invtype=this.patentType
         var invtype = this.patentType
         console.log(invtype)
         //console.log('ap'+ ap)
         var markList=this.zkmarkList
         let marks = []
         markList.forEach(mark => {
-            let  m = Object.create(null)
-            m['an'] = ap
-            m['type'] = mark['type']
-            m['word'] = mark['word']
-            marks.push(m)
+          let  m = Object.create(null)
+          m['an'] = ap
+          m['type'] = mark['type']
+          m['word'] = mark['word']
+          marks.push(m)
         })
         this.addZKMark({marks,ap,invtype}).then(data => {
           if (data.flag) {
@@ -584,13 +531,13 @@
         this.pageLoading = false
         if(this.zkPatentListResult.length != 0) {
           var an = this.zkPatentListResult[0].Ap
-         /* this.searchZKPatentDetail({an}).then(() => {
-            var title=this.currentPatent.TI
-            this.searchZKTiChaiCi(title).then(() => {
-              this.patentLoading = false
-              this.pageLoading = false
-            })
-          })*/
+          /* this.searchZKPatentDetail({an}).then(() => {
+             var title=this.currentPatent.TI
+             this.searchZKTiChaiCi(title).then(() => {
+               this.patentLoading = false
+               this.pageLoading = false
+             })
+           })*/
           var title=this.zkPatentListResult[0].TI
           console.log("title"+ title)
           this.searchZKPatentDetailUnion({an,title}).then(() => {
@@ -690,11 +637,24 @@
     outline: none;
   }
   .patent-scroll{
-    max-height: 1000px;
+    max-height: 1240px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .patent-scroll-clam{
+    max-height: 800px;
     overflow-x: hidden;
     overflow-y: auto;
   }
   .marks-words .el-textarea {
     width:80%;
+  }
+  .item-title {
+    line-height: 40px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .lineheight{
+    line-height: 25px;
   }
 </style>

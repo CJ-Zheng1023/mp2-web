@@ -110,7 +110,17 @@ let router = new Router({
         title: '智库案卷标引',
         requireAuth: true
       }
+    },
+    {
+      path: '/ZKPatentMarkTemp',
+      name: 'ZKPatentMarkTemp',
+      component: () => import('../components/ZKPatentMark/ResultTemp'),
+      meta: {
+        title: '案卷测试标引',
+        requireAuth: true
+      }
     }
+
   ]
 })
 router.beforeEach((to, from, next) => {

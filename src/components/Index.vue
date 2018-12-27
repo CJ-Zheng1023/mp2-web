@@ -93,6 +93,21 @@
             </div>
           </el-card>
         </el-col>
+        <el-col :span="6">
+          <el-card :body-style="{ padding: '0px' }">
+            <div class="card-header" style="background: linear-gradient(90deg, #145978, #1e769c);">
+              <img src="../assets/images/card-bg.png" width="100%" />
+              <div class="circle">
+                <i class="fa fa-2x fa-key" style="color: #00adef;"></i>
+              </div>
+            </div>
+            <div style="padding: 14px;">
+              <router-link to="/ZKPatentMarkTemp">
+                <el-button type="text" class="button">案卷测试标引</el-button>
+              </router-link>
+            </div>
+          </el-card>
+        </el-col>
       </el-row>
     </div>
   </div>

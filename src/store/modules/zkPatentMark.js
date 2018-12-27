@@ -10,7 +10,8 @@ export default {
       ClmsChaici: '',
       DescChaici: '',
       ZKchaiCiList: '',
-      zkmarkList: []
+      zkmarkList: [],
+      removeErrorKeyWordFlag: ''
     }
   },
   mutations: {
@@ -28,7 +29,11 @@ export default {
     },
     showZKMarkList (state, data) {
       state.zkmarkList = data.zkmarkList
+    },
+    removeZKFlag (state, data) {
+      state.removeZKErrorKeyWordFlag = data.removeZKErrorKeyWordFlag
     }
+
   },
   actions: {
     searchZKPatent ({commit}) {
@@ -62,7 +67,8 @@ export default {
         })
       })
     },
-    addZKMark ({commit, dispatch}, {marks, an}) {
+    addZKMark ({commit, dispatch}, {marks, an, invtype}) {
+      console.log(invtype)
       let markList = JSON.parse(JSON.stringify(marks))
       return new Promise((resolve, reject) => {
         axios({
@@ -70,6 +76,7 @@ export default {
           method: 'post',
           data: {
             markList: JSON.stringify(markList),
+            patenttype: invtype,
             an: an
           },
           params: {
@@ -114,6 +121,25 @@ export default {
         axios.get(MODULE_CONTEXT + `/patent/search/list?start=${start}&size=${size}&token=${window.localStorage.getItem('token')}`).then(response => {
           commit('ZKPatentListMutation', response.data)
           resolve()
+        }).catch(e => {
+          console.log(e)
+        })
+      })
+    },
+    removeZKErrorKeyWords ({commit, dispatch}, {key}) {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: MODULE_CONTEXT + '/keyword/remove/key',
+          method: 'post',
+          data: {
+            errorKeyWord: key
+          },
+          params: {
+            token: window.localStorage.getItem('token')
+          }
+        }).then(response => {
+          commit('removeZKFlag', response.data)
+          resolve(response.data)
         }).catch(e => {
           console.log(e)
         })
