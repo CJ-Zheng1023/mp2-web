@@ -21,7 +21,7 @@
                 <el-col>
                   <div class="pagination">
                     <el-pagination
-                      @current-change="clickZKPagination"
+                      @current-change="clickZKPaginationTemp"
                       background
                       font-size="12px !important"
                       :current-page="currentPage"
@@ -43,99 +43,145 @@
             </el-card>
           </el-col>
           <el-col :span="20">
-            <div class="patent-detail-warp" v-loading="patentLoading">
-              <el-row :gutter="5">
-                <el-col :span="12" class="mark-title">
-                  <div class="portlet">
-                    <div class="portlet-body">
-                      <div class="">
+            <el-row>
+              <div class="patent-detail-warp" v-loading="patentLoading">
+                <el-row :gutter="5">
+                  <el-col :span="12" class="mark-title">
+                    <div class="portlet">
+                      <div class="portlet-body">
                         <div class="">
-                          <div v-if="currentPatent">
-                            <div class="patent-item">
-                              <label>申请号:</label>
-                              <div class="content">{{currentPatent.Ap}}</div>
+                          <div class="">
+                            <div v-if="currentPatent">
+                              <div class="patent-item">
+                                <label>申请号:</label>
+                                <div class="content">{{currentPatent.Ap}}</div>
+                              </div>
+                              <div class="patent-item">
+                                <label>申请人:</label>
+                                <div class="content">{{currentPatent.PA}}</div>
+                              </div>
+                              <div class="patent-item">
+                                <label>发明名称:</label>
+                                <template>
+                                  <el-radio-group v-model="patentType">
+                                    <el-radio :label="2">产品</el-radio>
+                                    <el-radio :label="1">方法</el-radio>
+                                    <el-radio :label="3">组合型</el-radio>
+                                  </el-radio-group>
+                                </template>
+                                <div class="content" tabindex='-1' @keyup.18="markWord(1, $event)">{{currentPatent.TI}}</div>
+                              </div>
+                              <div class="item-title">
+                                <label>权利要求:</label>
+                              </div>
+                              <div  class="content clearfocusoutline lineheight patent-scroll-clam" tabindex='-1' @keyup.18="markWord(2, $event)">
+                                <div v-html="ZKPatentDetailInfo.CLIMS"></div>
+                              </div>
                             </div>
-                            <div class="patent-item">
-                              <label>发明名称:</label>
-                              <template>
-                                <el-radio-group v-model="patentType">
-                                  <el-radio :label="2">产品</el-radio>
-                                  <el-radio :label="1">方法</el-radio>
-                                  <el-radio :label="3">组合型</el-radio>
-                                </el-radio-group>
-                              </template>
-                              <div class="content" tabindex='-1' @keyup.18="markWord(1, $event)">{{currentPatent.TI}}</div>
-                            </div>
-                            <div class="item-title">
-                              <label>权利要求:</label>
-                            </div>
-                            <div  class="content clearfocusoutline lineheight patent-scroll-clam" tabindex='-1' @keyup.18="markWord(2, $event)">
-                              <div v-html="ZKPatentDetailInfo.CLIMS"></div>
-                            </div>
-                          </div>
-                          <div>
                             <div>
-                              <div class="refer">
-                                <i class="el-icon-star-off"></i><label>标题拆词如下:</label>
-                              </div>
-                              <div style="min-height: 50px;margin-top:10px;">
-                                <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'" @close="closeMark(item)" :closable="true" class="mark-item"  v-for="item in ZKTiWords" :key="item.word + item.type">{{item.word}}</el-tag>
-                              </div>
-                              <div class="input-title" style="font-size:14px;font-weight: 600;line-height: 40px;">手动输入标题词:</div>
-                              <div class="marks-words">
-                                <el-input
-                                  type="textarea"
-                                  :rows="2"
-                                  placeholder="请输入内容" v-model="inputTitleWord" style="">
-                                </el-input>
-                                <el-button type="success" plain @click="addTitleWord" size="medium">添加</el-button>
-                              </div>
-                            </div>
-                            <div class="marks-words">
-                              <div class="refer">
-                                <i class="el-icon-star-off"></i><label>权利要求和说明书拆词如下:</label>
-                              </div>
-                              <div style="min-height: 50px;margin-top:10px;">
-                                <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'"  @close="closeMark(item)" :closable="true"  class="mark-item"  v-for="item in clmsWords" :key="item.word + item.type">{{item.word}}</el-tag>
-                              </div>
-                              <div class="input-title" style="font-size:14px;font-weight: 600;line-height: 40px;">手动输入权利要求,说明书中关键词:</div>
                               <div>
-                                <el-input
-                                  type="textarea"
-                                  :rows="2"
-                                  placeholder="请输入内容" v-model="inputOthersWord" style="">
-                                </el-input>
-                                <el-button type="success" plain @click="addOthersWord" size="medium">添加</el-button>
+                                <div class="refer">
+                                  <i class="el-icon-star-off"></i><label>标题拆词如下:</label>
+                                </div>
+                                <div style="min-height: 50px;margin-top:10px;">
+                                  <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'" @close="closeMark(item)" :closable="true" class="mark-item"  v-for="item in ZKTiWords" :key="item.word + item.type">{{item.word}}</el-tag>
+                                </div>
+                                <div class="input-title" style="font-size:14px;font-weight: 600;line-height: 40px;">手动输入标题词:</div>
+                                <div class="marks-words">
+                                  <el-input
+                                    type="textarea"
+                                    :rows="2"
+                                    placeholder="请输入内容" v-model="inputTitleWord" style="">
+                                  </el-input>
+                                  <el-button type="success" plain @click="addTitleWord" size="medium">添加</el-button>
+                                </div>
+                              </div>
+                              <div class="marks-words">
+                                <div class="refer">
+                                  <i class="el-icon-star-off"></i><label>权利要求和说明书拆词如下:</label>
+                                </div>
+                                <div style="min-height: 50px;margin-top:10px;">
+                                  <el-tag :disable-transitions=true :type="item.id ? 'primary' : 'warning'"  @close="closeMark(item)" :closable="true"  class="mark-item"  v-for="item in clmsWords" :key="item.word + item.type">{{item.word}}</el-tag>
+                                </div>
+                                <div class="input-title" style="font-size:14px;font-weight: 600;line-height: 40px;">手动输入权利要求,说明书中关键词:</div>
+                                <div>
+                                  <el-input
+                                    type="textarea"
+                                    :rows="2"
+                                    placeholder="请输入内容" v-model="inputOthersWord" style="">
+                                  </el-input>
+                                  <el-button type="success" plain @click="addOthersWord" size="medium">添加</el-button>
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
+                      <div class="dialog-footer">
+                        <el-button :loading="btnLoading" type="primary" @click="onSubmit" :disabled="saved">保存标引词</el-button>
+                      </div>
+                      <div>
+                        <el-row><el-button-group size="small"  class="prev-next-btn"><el-button type="primary" plain @click="prevZKPatnet" class="prev-patent" icon="el-icon-arrow-left">上一篇</el-button><el-button type="primary" plain  @click="nextZKPatent" class="next-patent">下一篇<i class="el-icon-arrow-right el-icon--right"></i></el-button></el-button-group></el-row>
+                      </div>
                     </div>
-                    <div class="dialog-footer">
-                      <el-button :loading="btnLoading" type="primary" @click="onSubmit" :disabled="saved">保存标引词</el-button>
-                    </div>
-                    <div>
-                      <el-row><el-button-group size="small"  class="prev-next-btn"><el-button type="primary" plain @click="prevZKPatnet" class="prev-patent" icon="el-icon-arrow-left">上一篇</el-button><el-button type="primary" plain  @click="nextZKPatent" class="next-patent">下一篇<i class="el-icon-arrow-right el-icon--right"></i></el-button></el-button-group></el-row>
-                    </div>
-                  </div>
-                </el-col>
-                <el-col :span="12" class="patent-detail">
-                  <div class="portlet">
-                    <div class="portlet-body">
-                      <div v-if="currentPatent">
-                        <div class="item-title">
-                           <label>说明书:</label>
-                        </div>
-                        <div  class="content clearfocusoutline patent-scroll lineheight" tabindex='-1' @keyup.18="markWord(2, $event)">
-                          <div v-html="ZKPatentDetailInfo.DESC"></div>
+                  </el-col>
+                  <el-col :span="12" class="patent-detail">
+                    <div class="portlet">
+                      <div class="portlet-body">
+                        <div v-if="currentPatent">
+                          <div class="item-title">
+                            <label>说明书:</label>
+                          </div>
+                          <div  class="content clearfocusoutline patent-scroll lineheight" tabindex='-1' @keyup.18="markWord(2, $event)">
+                            <div v-html="ZKPatentDetailInfo.DESC"></div>
+                          </div>
                         </div>
                       </div>
                     </div>
+                  </el-col>
+                </el-row>
+              </div>
+            </el-row>
+            <el-row>
+               <el-card>
+                 <div v-loading="locationLoading" class="location-scroll">
+                   <div style="margin-bottom: 10px;">
+                     <el-input v-model="locationInputValue"  style="width:200px;" placeholder="请输入内容"></el-input>
+                     <el-button type="success" plain @click="searcLocationResult" size="medium">提交</el-button>
+                   </div>
+                   <div class="location-list" v-if="this.showZKPatentLocationList !=null">
+                     <div>
+                       <el-table
+                         :data="lcoationListFilter"
+                         border
+                         style="width: 100%;"  :header-cell-style="{'background-color': '#9999D1','color': '#5E5E5E','text-align':'left','opacity': '0.7','height':'5px'}" >
+                         <el-table-column prop="an" label="申请号"  class="table-item"></el-table-column>
+                         <el-table-column prop="ti" label="标题" class="table-item"></el-table-column>
+                         <el-table-column label="排名" prop="XH" class="table-item"></el-table-column>
+                       </el-table>
+                     </div>
+                   </div>
+                 </div>
+               </el-card>
+              <el-card>
+                <el-input   v-model="searchAn" style="width:200px;" placeholder="请输入an"></el-input>
+                <el-button type="success" plain @click="getZKTempPatent" size="medium">提交</el-button>
+                <div v-if="ZKPatentByAnInfo">
+                  <div class="item-title">
+                    <label>权利要求:</label>
                   </div>
-                </el-col>
-              </el-row>
-            </div>
+                  <div  class="content clearfocusoutline lineheight patent-scroll-clam" >
+                    <div v-html="ZKPatentByAnInfo.CLIMS"></div>
+                  </div>
+                  <div class="item-title">
+                    <label>说明书:</label>
+                  </div>
+                  <div  class="content clearfocusoutline  lineheight">
+                    <div v-html="ZKPatentByAnInfo.DESC"></div>
+                  </div>
+                </div>
+              </el-card>
+            </el-row>
           </el-col>
         </el-row>
       </div>
@@ -157,7 +203,10 @@
         btnLoading: false,
         inputOthersWord: '',
         patentType: 2,
-        inputTitleWord: ''
+        inputTitleWord: '',
+        locationLoading: '',
+        PatentByAnLoading:'',
+        searchAn: ''
       }
     },
     computed: {
@@ -168,8 +217,34 @@
         'ZKchaiCiList',
         'ClmsChaici',
         'zkmarkList',
-        'DescChaici'
+        'DescChaici',
+        'showZKPatentLocationList',
+        'ZKPatentByAnInfo'
       ]),
+      locationInputValue () {
+        if(this.zkPatentListResult.length !=0){
+          return this.zkPatentListResult[this.index].Ap
+        }
+      },
+      lcoationListFilter(){
+          let m = Object
+          let list = [];
+          this.showZKPatentLocationList.forEach((item ,index)=>{
+            if(index <100){
+              let  m = Object.create(null)
+              m['an'] = item.an
+              m['ti'] = item.ti
+              m['XH'] = index + 1
+              //item['XH'] = index + 1
+              list.push(m)
+            }
+            else{
+              return;
+            }
+          })
+       // return this.showZKPatentLocationList
+          return list
+      },
       currentPage () {
         let pagination = this.pagination
         return (pagination.start + pagination.size) / pagination.size
@@ -215,8 +290,24 @@
         'showZKMarkList',
         'searchZKPatentDetailUnion',
         'searchZKPatentFormTwo',
-        'removeZKErrorKeyWords'
+        'removeZKErrorKeyWords',
+        'searchPatentLocation',
+        'searchPatentByAn'
       ]),
+      getZKTempPatent () {
+        this.PatentByAnLoading = true
+        var an=this.searchAn
+        this.searchPatentByAn({an}).then(() => {
+          this.PatentByAnLoading = false
+        })
+      },
+      searcLocationResult (){
+        var an= this.locationInputValue
+        this.locationLoading = true
+        this.searchPatentLocation({an}).then(() => {
+          this.locationLoading = false
+        })
+      },
       addTitleWord () {
         var type = 1
         var word = this.inputTitleWord.split(',')
@@ -364,7 +455,7 @@
           }
         }
       },
-      clickZKPagination (curPage) {
+      clickZKPaginationTemp (curPage) {
         if (!this.saved) {
           this.$confirm('您尚有未保存的标引词, 是否离开?', '提示', {
             confirmButtonText: '确定',
@@ -638,6 +729,11 @@
   }
   .patent-scroll{
     max-height: 1240px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .location-scroll{
+    max-height: 500px;
     overflow-x: hidden;
     overflow-y: auto;
   }

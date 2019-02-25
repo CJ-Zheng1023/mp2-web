@@ -11,7 +11,9 @@ export default {
       DescChaici: '',
       ZKchaiCiList: '',
       zkmarkList: [],
-      removeErrorKeyWordFlag: ''
+      removeErrorKeyWordFlag: '',
+      showZKPatentLocationList: [],
+      ZKPatentByAnInfo: ''
     }
   },
   mutations: {
@@ -24,6 +26,9 @@ export default {
       state.ClmsChaici = data.ClmsChaici
       state.DescChaici = data.DescChaici
     },
+    ZKPatentByAnMutation (state, data) {
+      state.ZKPatentByAnInfo = data.ZKPatentDetailInfo
+    },
     showZKTiChaiCiMutation (state, data) {
       state.ZKchaiCiList = data.ZKchaiCiList
     },
@@ -32,8 +37,10 @@ export default {
     },
     removeZKFlag (state, data) {
       state.removeZKErrorKeyWordFlag = data.removeZKErrorKeyWordFlag
+    },
+    showPatentLocation (state, data) {
+      state.showZKPatentLocationList = data.data
     }
-
   },
   actions: {
     searchZKPatent ({commit}) {
@@ -59,9 +66,24 @@ export default {
     },
     searchZKTiChaiCi ({commit}, ti) {
       return new Promise((resolve, reject) => {
-        axios.get(MODULE_CONTEXT + `/chaici/list/${ti}?token=${window.localStorage.getItem('token')}`).then(response => {
+      /*  axios.get(MODULE_CONTEXT + `/chaici/list/${ti}?token=${window.localStorage.getItem('token')}`).then(response => {
           commit('showZKTiChaiCiMutation', response.data)
           resolve()
+        }).catch(e => {
+          console.log(e)
+        }) */
+        axios({
+          url: MODULE_CONTEXT + '/chaici/list',
+          method: 'post',
+          data: {
+            title: ti
+          },
+          params: {
+            token: window.localStorage.getItem('token')
+          }
+        }).then(response => {
+          resolve(response.data)
+          commit('showZKTiChaiCiMutation', response.data)
         }).catch(e => {
           console.log(e)
         })
@@ -105,7 +127,17 @@ export default {
         axios.all([
           axios.get(MODULE_CONTEXT + `/patent/search/${an}?token=${window.localStorage.getItem('token')}`),
           axios.get(MODULE_CONTEXT + `/keyword/search/${an}?token=${window.localStorage.getItem('token')}`),
-          axios.get(MODULE_CONTEXT + `/chaici/list/${title}?token=${window.localStorage.getItem('token')}`)
+          // axios.get(MODULE_CONTEXT + `/chaici/list/${title}?token=${window.localStorage.getItem('token')}`)
+          axios({
+            url: MODULE_CONTEXT + '/chaici/list',
+            method: 'post',
+            data: {
+              title: title
+            },
+            params: {
+              token: window.localStorage.getItem('token')
+            }
+          })
         ]).then(axios.spread((patentDetailResponse, markListResponse, chaiCiResponse) => {
           commit('ZKPatentDetailMutation', patentDetailResponse.data)
           commit('showZKMarkList', markListResponse.data)
@@ -140,6 +172,27 @@ export default {
         }).then(response => {
           commit('removeZKFlag', response.data)
           resolve(response.data)
+        }).catch(e => {
+          console.log(e)
+        })
+      })
+    },
+    searchPatentLocation ({commit}, {an}) {
+      return new Promise((resolve, reject) => {
+        axios.get(`http://10.51.52.84:9090/sim/an?an=${an}`).then(response => {
+          commit('showPatentLocation', response.data)
+          resolve()
+        }).catch(e => {
+          console.log(e)
+        })
+      })
+    },
+    searchPatentByAn ({commit}, {an}) {
+      return new Promise((resolve, reject) => {
+        axios.get(MODULE_CONTEXT + `/patent/search/${an}?token=${window.localStorage.getItem('token')}`).then(response => {
+          commit('ZKPatentByAnMutation', response.data)
+          console.log(response.data)
+          resolve()
         }).catch(e => {
           console.log(e)
         })

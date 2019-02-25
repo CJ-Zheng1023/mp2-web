@@ -51,7 +51,7 @@
                 <el-col :span="12" class="selfpatentBaseInfo">
                   <div class="card">
                     <div  class="head">
-                      <span>本申请专利</span>
+                      <span>本申请专利341</span>
                     </div>
                     <div class="card-main">
                       <div class="base">
@@ -164,6 +164,15 @@
                           <div style="min-height: 50px;margin-top:10px;">
                             <el-tag :disable-transitions=true :type="item.an ? 'primary' : 'warning'"  class="mark-item" @close="closePatentMark(item)" :closable="true"  v-for="item in patentTiWords" :key="item.word + item.type">{{item.word}}</el-tag>
                           </div>
+                          <div class="input-title">手动输入标题词:</div>
+                          <div class="manual-input">
+                            <el-input
+                              type="textarea"
+                              :rows="2"
+                              placeholder="请输入内容" v-model="inputTitleWord">
+                            </el-input>
+                            <el-button type="success" plain @click="addTitleWord" size="medium">添加</el-button>
+                          </div>
                         </div>
                         <div class="Chaici othersChaici">
                           <div >其他自段拆词如下:</div>
@@ -171,7 +180,7 @@
                             <el-tag :disable-transitions=true :type="item.an ? 'primary' : 'warning'"  class="mark-item" @close="closePatentMark(item)" :closable="true" v-for="item in patentCLMSWords" :key="item.word + item.type">{{item.word}}</el-tag>
                           </div>
                           <div class="input-title">手动输入权利要求,说明书中关键词:</div>
-                          <div>
+                          <div class="manual-input">
                             <el-input
                               type="textarea"
                               :rows="2"
@@ -404,7 +413,8 @@ export default {
       sortByKeywordFreqsText: '',
       inputPatentAn: '',
       inputOthersWord: '',
-      locationLoading: ''
+      locationLoading: '',
+      inputTitleWord: ''
     }
   },
   computed: {
@@ -542,6 +552,18 @@ export default {
     }
   },
   methods: {
+    addTitleWord () {
+      var type = 1
+      var word = this.inputTitleWord.split(',')
+      word.forEach((item,index)=>{
+        var word= item
+        this.patentMarkList.push({
+          type,
+          word
+        })
+      })
+      this.inputTitleWord=''
+    },
     addInputWord (){
       var type = 2
       var word = this.inputOthersWord.split(',')
@@ -976,7 +998,7 @@ export default {
     margin-top: 10px;
     margin-bottom: 10px;
   }
-  .Chaici.othersChaici .el-textarea {
+  .Chaici .manual-input .el-textarea {
      width:80%;
   }
   .mark-item{
