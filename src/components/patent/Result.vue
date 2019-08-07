@@ -85,6 +85,13 @@
                               <div class="patent-item">
                                 <label>发明名称:</label>
                                 <div class="content" tabindex='-1' @keyup.18="markPatentWord(1, $event)"  v-html="this.selfpatentBaseInfo.TI"></div>
+                                <template>
+                                  <el-radio-group v-model="patentType">
+                                    <el-radio :label="2">产品</el-radio>
+                                    <el-radio :label="1">方法</el-radio>
+                                    <el-radio :label="3">组合型</el-radio>
+                                  </el-radio-group>
+                                </template>
                               </div>
                               <div class="refer">
                                 <i class="el-icon-star-off"></i><label>标题拆词参考:</label>
@@ -123,10 +130,10 @@
                               </div>
                             </el-collapse-item>
                           </div>
-                        <!--  <el-collapse-item title="摘要" name="4">
+                          <el-collapse-item title="摘要" name="6">
                             <div v-html="this.selfpatentBaseInfo.AB">
                             </div>
-                          </el-collapse-item>-->
+                          </el-collapse-item>
                           <div>
                             <el-collapse-item title="说明书拆词参考" name="5">
                               <div class="marks-scroll patent-height">
@@ -277,10 +284,10 @@
                               </div>
                             </el-collapse-item>
                           </div>
-                         <!-- <el-collapse-item title="摘要" name="4">
+                          <el-collapse-item title="摘要" name="6">
                             <div v-html="this.citepatentBaseInfo.AB">
                             </div>
-                          </el-collapse-item>-->
+                          </el-collapse-item>
                           <div>
                             <el-collapse-item title="说明书拆词参考" name="5">
                               <div class="marks-scroll patent-height">
@@ -414,7 +421,8 @@ export default {
       inputPatentAn: '',
       inputOthersWord: '',
       locationLoading: '',
-      inputTitleWord: ''
+      inputTitleWord: '',
+      patentType: 2
     }
   },
   computed: {
@@ -552,6 +560,9 @@ export default {
     }
   },
   methods: {
+    _setPatentType () {
+      this.patentType = this.patentMarkList[0] ? this.patentMarkList[0].inv_type : 2
+    },
     addTitleWord () {
       var type = 1
       var word = this.inputTitleWord.split(',')
@@ -599,6 +610,7 @@ export default {
       })
     },
     onSubmit () {
+      var invtype = this.patentType
       this.btnLoading = true
       var an = this.compResult[this.index].an
       var citedAn = this.compResult[this.index].citedAn === '' ? '1' : this.compResult[0].citedAn
@@ -612,15 +624,7 @@ export default {
         m['word'] = mark['word']
         marks.push(m)
       })
-      let citedmarks = []
-      citedpatentmarkList.forEach(mark => {
-        let  m = Object.create(null)
-        m['an'] = citedAn
-        m['type'] = mark['type']
-        m['word'] = mark['word']
-        citedmarks.push(m)
-      })
-      this.addPatentMarks({an,marks,citedmarks}).then(data => {
+      this.addPatentMarks({an,marks,invtype}).then(data => {
         if (data.flag) {
           this.$alert('添加成功', '提示', {
             confirmButtonText: '确定',
@@ -675,6 +679,7 @@ export default {
         var an = this.compResult[0].an
         var citedAn = this.compResult[0].citedAn === '' ? '1' : this.compResult[0].citedAn
         this.searchPatentDetailUnion({an,citedAn}).then(() => {
+          this._setPatentType();
           this.patentLoading = false
         })
       })
@@ -688,6 +693,7 @@ export default {
       var citedAn = row.citedAn === '' ? '1' : row.citedAn
       this.patentLoading = true
       this.searchPatentDetailUnion({an,citedAn}).then(() => {
+        this._setPatentType()
         this.patentLoading = false
       })
     },
@@ -703,6 +709,7 @@ export default {
         var an = this.compResult[this.index].an
         var citedAn = this.compResult[this.index].citedAn === '' ? '1' : this.compResult[this.index].citedAn
         this.searchPatentDetailUnion({an,citedAn}).then(() => {
+          this._setPatentType()
           this.patentLoading = false
         })
       }
@@ -719,6 +726,7 @@ export default {
         var an = this.compResult[this.index].an
         var citedAn = this.compResult[this.index].citedAn === '' ? '1' : this.compResult[this.index].citedAn
         this.searchPatentDetailUnion({an,citedAn}).then(() => {
+          this._setPatentType()
           this.patentLoading = false
         })
       }

@@ -89,7 +89,7 @@ export default {
         })
       })
     },
-    addZKMark ({commit, dispatch}, {marks, an, invtype}) {
+    addZKMark ({commit, dispatch}, {an, marks, invtype}) {
       console.log(invtype)
       let markList = JSON.parse(JSON.stringify(marks))
       return new Promise((resolve, reject) => {

@@ -467,8 +467,8 @@ export default {
     height: 400px;
     overflow-y: auto;
   }
-  .patent-scroll{
+  /*.patent-scroll{
     height: 428px;
     overflow-y: auto;
-  }
+  }*/
 </style>

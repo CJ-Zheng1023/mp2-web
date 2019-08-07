@@ -104,7 +104,7 @@ export default {
         })
       })
     },
-    addPatentMarks ({commit, dispatch}, {an, marks, citedmarks}) {
+    addPatentMarks ({commit, dispatch}, {an, marks, invtype}) {
       let markList = JSON.parse(JSON.stringify(marks))
       return new Promise((resolve, reject) => {
         axios({
@@ -112,7 +112,7 @@ export default {
           method: 'post',
           data: {
             markList: JSON.stringify(markList),
-            citedMarkList: JSON.stringify(citedmarks),
+            patenttype: invtype,
             an: an
           },
           params: {

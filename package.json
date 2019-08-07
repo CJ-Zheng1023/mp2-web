@@ -99,5 +99,19 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ]
+  ],
+  "main": ".eslintrc.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CJ-Zheng1023/mp2-web.git"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CJ-Zheng1023/mp2-web/issues"
+  },
+  "homepage": "https://github.com/CJ-Zheng1023/mp2-web#readme"
 }

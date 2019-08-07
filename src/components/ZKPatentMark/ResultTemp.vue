@@ -520,7 +520,7 @@
       },
       onSubmit () {
         this.btnLoading = true
-        var ap=this.currentPatent.Ap
+        var an=this.currentPatent.Ap
         // var invtype=this.patentType
         var invtype = this.patentType
         console.log(invtype)
@@ -529,19 +529,19 @@
         let marks = []
         markList.forEach(mark => {
           let  m = Object.create(null)
-          m['an'] = ap
+          m['an'] = an
           m['type'] = mark['type']
           m['word'] = mark['word']
           marks.push(m)
         })
-        this.addZKMark({marks,ap,invtype}).then(data => {
+        this.addZKMark({an,marks,invtype}).then(data => {
           if (data.flag) {
             this.$alert('添加成功', '提示', {
               confirmButtonText: '确定',
               type: 'success'
             }).then(action => {
               this.loading = true
-              this.showZKMarkList(ap).then(() => {
+              this.showZKMarkList(an).then(() => {
                 this._setPatentType()
                 this.loading = false
                 this.btnLoading = false
