@@ -23,7 +23,7 @@ body{
 }
 .page-search .main{
   max-width: 1250px;
-  margin: 30px auto;
+  margin: 10px auto;
 }
 .form-wrapper{
   width: 360px;
@@ -75,11 +75,6 @@ body{
 }
 .el-collapse-item__wrap{
   border-bottom: none;
-}
-.pagination .el-pagination__jump{
-  float: left;
-  margin-top:10px;
-  margin-left: 0;
 }
 
 

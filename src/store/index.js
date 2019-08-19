@@ -7,6 +7,7 @@ import comp from './modules/comp'
 import electrical from './modules/electrical'
 import patent from './modules/patent'
 import ZKPatentMark from './modules/zkPatentMark'
+import fulltext from './modules/fulltext'
 Vue.use(Vuex)
 export default new Vuex.Store({
   modules: {
@@ -16,6 +17,7 @@ export default new Vuex.Store({
     compModule: comp,
     electricalModule: electrical,
     patentModule: patent,
-    zkPatentModule: ZKPatentMark
+    zkPatentModule: ZKPatentMark,
+    fullTextModule: fulltext
   }
 })

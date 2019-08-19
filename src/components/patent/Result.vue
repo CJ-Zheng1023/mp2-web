@@ -4,19 +4,57 @@
     <search-header :ifSearch=false>
     </search-header>
     <div class="main">
+      <div class="patent-menu" style="font-size: 15px;">
+        <div>
+          <el-button type="primary" plain  @click="tableShow = true" icon="el-icon-s-unfold">案卷列表</el-button>
+        </div>
+        <el-drawer
+          title="案卷列表"
+          custom-class="demo-drawer"
+          ref="drawer"
+          :visible.sync="tableShow"
+          direction="ltr"
+          size="33%">
+          <div  v-if="compResult.length !=0" >
+            <div class="an-list">
+                <el-table
+                  :data="compResult"
+                  border
+                  max-height="480"
+                  style="width: 100%;" @row-click="openDetails" :row-class-name="tableRowClassName" :row-style="selectHighLight" :header-cell-style="{'background-color': '#007fff','color': 'white','text-align':'left','opacity': '0.7'}" >
+                  <el-table-column property="apoldAn" label="申请号"   class="table-item"></el-table-column>
+                  <el-table-column property="citedAn" label="对比申请号"  class="table-item"></el-table-column>
+                  <el-table-column property="citeType" label="类型"  class="table-item"></el-table-column>
+                  <el-table-column property="location" label="排名"  class="table-item"></el-table-column>
+                </el-table>
+                <div class="pagination">
+                   <el-pagination
+                      @current-change="clickPagination"
+                      background
+                      font-size="12px !important"
+                      :current-page="currentPage"
+                      layout="prev, next, jumper"
+                      :page-size="pagination.size"
+                      :total="pagination.total">
+                   </el-pagination>
+                </div>
+            </div>
+          </div>
+        </el-drawer>
+      </div>
       <el-row :gutter="24">
-        <el-col :span="7" v-if="compResult.length !=0" class="left-nav">
+        <!--<el-col :span="7" v-if="compResult.length !=0" class="left-nav">
           <div class="an-list">
             <el-row :gutter="24">
               <el-table
                 :data="compResult"
                 border
-                style="width: 100%;" @row-click="openDetails" :row-class-name="tableRowClassName" :row-style="selectHighLight" :header-cell-style="{'background-color': '#9999D1','color': '#5E5E5E','text-align':'left','opacity': '0.7'}" >
-                <el-table-column prop="apoldAn" label="申请号" width="154" class="table-item"></el-table-column>
-                <el-table-column  label="对比文献">
-                  <el-table-column prop="citedAn" label="申请号" width="145" class="table-item"></el-table-column>
-                  <el-table-column prop="citeType" label="类型" width="33" class="table-item"></el-table-column>
-                  <el-table-column prop="location" label="排名" width="61" class="table-item"></el-table-column>
+                style="width: 100%;" @row-click="openDetails" :row-class-name="tableRowClassName" :row-style="selectHighLight" :header-cell-style="{'background-color': '#007fff','color': 'white','text-align':'left','opacity': '0.7'}" >
+                <el-table-column    prop="apoldAn" label="申请号" width="154" class="table-item"></el-table-column>
+                <el-table-column    label="对比文献">
+                  <el-table-column  prop="citedAn" label="申请号" width="145" class="table-item"></el-table-column>
+                  <el-table-column   prop="citeType" label="类型" width="33" class="table-item"></el-table-column>
+                  <el-table-column   prop="location" label="排名" width="61" class="table-item"></el-table-column>
                 </el-table-column>
               </el-table>
             </el-row>
@@ -28,7 +66,7 @@
                     background
                     font-size="12px !important"
                     :current-page="currentPage"
-                    layout="prev, pager, next"
+                    layout="prev, next, jumper"
                     :page-size="pagination.size"
                     :total="pagination.total">
                   </el-pagination>
@@ -43,15 +81,15 @@
           <el-card class="box-card">
             <p>空空如也~</p>
           </el-card>
-        </el-col>
-        <el-col :span="17" v-if="compResult.length !=0">
-          <div class="patent-detail" v-loading="patentLoading">
+        </el-col>-->
+        <el-col :span="24" v-if="compResult.length !=0">
+          <div class="patent-border" v-loading="patentLoading">
             <div class="comp-main">
               <el-row :gutter="24">
                 <el-col :span="12" class="selfpatentBaseInfo">
                   <div class="card">
                     <div  class="head">
-                      <span>本申请专利341</span>
+                      <span><i class="el-icon-notebook-1" style="margin-right: 7px;"></i>本申请专利</span>
                     </div>
                     <div class="card-main">
                       <div class="base">
@@ -85,17 +123,19 @@
                               <div class="patent-item">
                                 <label>发明名称:</label>
                                 <div class="content" tabindex='-1' @keyup.18="markPatentWord(1, $event)"  v-html="this.selfpatentBaseInfo.TI"></div>
-                                <template>
+                               <!-- <template>
                                   <el-radio-group v-model="patentType">
                                     <el-radio :label="2">产品</el-radio>
                                     <el-radio :label="1">方法</el-radio>
                                     <el-radio :label="3">组合型</el-radio>
                                   </el-radio-group>
-                                </template>
+                                </template>-->
                               </div>
                               <div class="refer">
                                 <i class="el-icon-star-off"></i><label>标题拆词参考:</label>
+<!--
                                 <el-button type="primary" plain size="mini" @click="addPatentMark(1)" style="float: right">添加</el-button>
+-->
                               </div>
                               <div class="segment-refer" >
                                 <p>
@@ -110,7 +150,9 @@
                                 <div class="marks">
                                   <div class="refer">
                                     <i class="el-icon-star-off"></i><label>权力要求拆词参考:</label>
+<!--
                                     <el-button type="primary" plain size="mini" @click="addPatentCMLSMark(2)" style="float: right">添加</el-button>
+-->
                                   </div>
                                   <div class="segment-refer">
                                     <p>
@@ -140,7 +182,9 @@
                                 <div class="marks">
                                   <div class="refer">
                                     <i class="el-icon-star-off"></i><label>说明书拆词参考:</label>
+<!--
                                     <el-button type="primary" plain size="mini" @click="addPatentDESCMark(3)" style="float: right">添加</el-button>
+-->
                                   </div>
                                   <div class="segment-refer">
                                     <p>
@@ -166,7 +210,7 @@
                               </el-collapse-item>
                           </div>
                         </el-collapse>
-                        <div class="Chaici">
+                     <!--   <div class="Chaici">
                           <div >标题拆词如下:</div>
                           <div style="min-height: 50px;margin-top:10px;">
                             <el-tag :disable-transitions=true :type="item.an ? 'primary' : 'warning'"  class="mark-item" @close="closePatentMark(item)" :closable="true"  v-for="item in patentTiWords" :key="item.word + item.type">{{item.word}}</el-tag>
@@ -195,8 +239,7 @@
                             </el-input>
                             <el-button type="success" plain @click="addInputWord" size="medium">添加</el-button>
                           </div>
-                        </div>
-
+                        </div>-->
                       </div>
                     </div>
                   </div>
@@ -204,7 +247,7 @@
                 <el-col :span="12"  v-if="citepatentBaseInfo" class="citepatentBaseInfo">
                   <div class="card">
                     <div class="head">
-                      <span>对比文献专利</span>
+                      <span><i class="el-icon-notebook-2" style="margin-right: 7px;"></i> 对比文献专利</span>
                     </div>
                     <div class="card-main">
                       <div class="base">
@@ -241,7 +284,9 @@
                               </div>
                               <div class="refer">
                                 <i class="el-icon-star-off"></i><label>标题拆词参考:</label>
+<!--
                                 <el-button type="primary" plain size="mini" @click="addCitedPatentMark(1)"  style="float: right">添加</el-button>
+-->
                               </div>
                               <div class="segment-refer">
                                 <p>
@@ -260,7 +305,9 @@
                               <div class="marks">
                                 <div class="refer">
                                   <i class="el-icon-star-off"></i><label>权力要求拆词参考:</label>
+<!--
                                   <el-button type="primary" plain size="mini" @click="addCitedPatentCMLSMark(2)" style="float: right">添加</el-button>
+-->
                                 </div>
                                 <div class="segment-refer">
                                   <p>
@@ -294,7 +341,9 @@
                                 <div class="marks">
                                   <div class="refer">
                                     <i class="el-icon-star-off"></i><label>说明书拆词参考:</label>
+<!--
                                     <el-button type="primary" plain size="mini" @click="addCitedPatentDESCMark(3)" style="float: right">添加</el-button>
+-->
                                   </div>
                                   <div class="segment-refer">
                                     <p>
@@ -329,20 +378,67 @@
                   </el-card>
                 </el-col>
               </el-row>
-              <div >
-                <el-button :loading="btnLoading" type="primary" @click="onSubmit" :disabled="saved">保存标引词</el-button>
-                <el-button-group class="prev-next-btn"><el-button type="primary" plain  @click="prev" class="prev-patent" icon="el-icon-arrow-left">上一篇</el-button><el-button type="primary" plain  @click="next" class="next-patent">下一篇<i class="el-icon-arrow-right el-icon--right"></i></el-button></el-button-group>
-              </div>
             </div>
           </div>
         </el-col>
-        <el-col :span="17" v-else>
+        <el-col :span="24" v-else>
           <el-card class="box-card">
             <p>空空如也~</p>
           </el-card>
         </el-col>
       </el-row>
-      <el-row :gutter="24">
+      <div class="patent-border">
+        <el-row :gutter="24">
+          <el-col :span="24">
+            <el-card class="box-card">
+              <div slot="header" class="clearfix">
+                <span style="color:#409EFF"> <i class="el-icon-edit"></i> 请输入检索式</span>
+              </div>
+              <div >
+                <el-input
+                  type="textarea"
+                  :rows="4"
+                  placeholder="请输入内容" v-model="searchWords">
+                </el-input>
+                <el-input
+                  type="textarea"
+                  :rows="4"
+                  placeholder="请输入内容" v-model="searchWords2">
+                </el-input>
+                <div style="margin-bottom: 10px;margin-top: 10px;font-size: 10px;"> 常用符号：</div>
+                <div style="margin-bottom: 10px;margin-top: 10px;"> <el-button  size="mini"  @click="addSymbol('(')"> ( </el-button> <el-button  size="mini"  @click="addSymbol(')')"> ) </el-button> <el-button  size="mini"  @click="addSymbol('and')"> and </el-button> <el-button  size="mini"  @click="addSymbol('or')"> or </el-button></div>
+                <div style="margin-bottom: 10px;">
+                  <el-button  size="mini"  @click="addSymbol('{}')"> {} </el-button>
+                  <el-button  size="mini"  @click="addSymbol('[]')"> [] </el-button>
+                  <el-button   size="mini"  @click="addSymbol('<>')"> &lt;&gt; </el-button>
+                </div>
+                <div style="margin-bottom: 10px;margin-top: 10px;">
+                  <div style="margin-bottom: 10px;font-size: 10px;"> 等同概念：</div>
+                  <span><el-button round  size="mini" @click="addSymbol('[基团 or 烷基or 烃基 or 苯基 or氨基 or卤代基or羟基]')"> [基团 or 烷基or 烃基 or 苯基 or氨基 or卤代基or羟基] </el-button></span>
+                  <span><el-button round size="mini" @click="addSymbol('{电解液 or 电解质}')"> {电解液 or 电解质} </el-button></span>   <span><el-button round  size="mini" @click="addSymbol('[循环 or 再生 or 二次 ]')">[循环 or 再生 or 二次 ] </el-button></span> <span><el-button round  size="mini" @click="addSymbol('<无机氧化物 or 陶瓷>')"> &lt;无机氧化物 or 陶瓷&gt;  </el-button></span>
+                </div>
+                <div >
+                  <!--<el-button :loading="btnLoading" type="primary" @click="onSubmit" :disabled="saved">保存标引词</el-button>-->
+                  <el-button :loading="btnLoading" type="primary" @click="onSubmit" :disabled="savedSearchWordsbtn">保存检索式</el-button>
+                  <el-button-group class="prev-next-btn"><el-button type="primary" plain  @click="prev" class="prev-patent" icon="el-icon-arrow-left">上一篇</el-button><el-button type="primary" plain  @click="next" class="next-patent">下一篇<i class="el-icon-arrow-right el-icon--right"></i></el-button></el-button-group>
+                  <div class="pagination">
+                    <el-pagination
+                      @current-change="clickPagination"
+                      background
+                      font-size="12px !important"
+                      :current-page="currentPage"
+                      layout="prev, next, jumper"
+                      :page-size="pagination.size"
+                      :total="pagination.total">
+                    </el-pagination>
+                  </div>
+                </div>
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+      </div>
+     <!-- <el-row :gutter="24">
         <el-col :span="17" :offset="7">
             <div class="patent-border" v-loading="locationLoading">
                 <el-card class="box-card">
@@ -363,7 +459,7 @@
                         style="width: 100%;"  :header-cell-style="{'background-color': '#9999D1','color': '#5E5E5E','text-align':'left','opacity': '0.7','height':'5px'}" >
                         <el-table-column prop="an" label="申请号"  class="table-item"></el-table-column>
                         <el-table-column prop="ti" label="标题" class="table-item"></el-table-column>
-                        <!--  <el-table-column prop="score" label="得分"  class="table-item"></el-table-column>-->
+                        &lt;!&ndash;  <el-table-column prop="score" label="得分"  class="table-item"></el-table-column>&ndash;&gt;
                         <el-table-column label="排名" prop="XH" class="table-item"></el-table-column>
                       </el-table>
                     </div>
@@ -371,13 +467,13 @@
                 </el-card>
             </div>
         </el-col>
-      </el-row>
+      </el-row>-->
       <el-row :gutter="24">
-        <el-col :span="17"  :offset="7">
+        <el-col :span="24">
           <div class="patent-border">
             <el-card class="box-card">
               <div slot="header" class="clearfix">
-                <span>文本拆词: </span>
+                <span style="color:#409EFF">文本拆词: </span>
                 <template v-if="compResult[index]">
                   <el-tag type="success">本申请号:{{this.compResult[index].an}}</el-tag>
                   <el-tag type="success">对比文献申请号:{{this.compResult[index].citedAn}}</el-tag>
@@ -387,7 +483,7 @@
               </div>
               <el-input
                 type="textarea"
-                :autosize="{ minRows: 2, maxRows: 10}"
+                :autosize="{ minRows: 2, maxRows: 80}"
                 placeholder="请输入内容"
                 v-model="sortByKeywordFreqsText" style="margin-bottom:20px;">
               </el-input>
@@ -420,9 +516,11 @@ export default {
       sortByKeywordFreqsText: '',
       inputPatentAn: '',
       inputOthersWord: '',
+      searchWords:'',
       locationLoading: '',
       inputTitleWord: '',
-      patentType: 2
+      patentType: 2,
+      tableShow: false
     }
   },
   computed: {
@@ -447,14 +545,13 @@ export default {
       'patentMarkList',
       'citedPatentMarkList',
       'sortByKeywordFreqsList',
-      'showPatentLocationList'
+      'showPatentLocationList',
+      'SearchWordMark'
     ]),
-    lcoationListFilter () {
+   /* lcoationListFilter () {
       let m = Object
-      //let list = this.showPatentLocationList
       let list = [];
       console.log(this.compResult[this.index].an)
-     // return list.filter(item => item.an === this.compResult[this.index].citedAn)
       this.showPatentLocationList.forEach((item ,index)=>{
             if(item.an === this.compResult[this.index].citedAn){
               let  m = Object.create(null)
@@ -467,8 +564,8 @@ export default {
 
       })
       return list
-    },
-    patentTiWords () {
+    },*/
+  /*  patentTiWords () {
       let marks = this.patentMarkList
       if (!marks) {
         return []
@@ -481,7 +578,7 @@ export default {
         return []
       }
       return marks.filter(mark => Number(mark.type) === 2)
-    },
+    },*/
    /* patentDESCWords () {
       let marks = this.patentMarkList
       if (!marks) {
@@ -489,7 +586,7 @@ export default {
       }
       return marks.filter(mark => Number(mark.type) === 3)
     },*/
-    citedPatentTiWords () {
+    /*citedPatentTiWords () {
       let marks = this.citedPatentMarkList
       if (!marks) {
         return []
@@ -502,7 +599,7 @@ export default {
         return []
       }
       return marks.filter(mark => Number(mark.type) === 2)
-    },
+    },*/
    /* citedPatentDESCWords () {
       let marks = this.citedPatentMarkList
       if (!marks) {
@@ -518,7 +615,15 @@ export default {
       let clmsStr = this.citepatentBaseInfo.CLIMS
       return this._formatCLMS(clmsStr)
     },
-    saved () {
+    savedSearchWordsbtn (){
+      let flag = true
+      if (this.searchWords == '') {
+        return flag
+      }else{
+        return false
+      }
+    },
+   /* saved () {
       let flag = true
       console.log(this.patentMarkList)
       if (!this.patentMarkList) {
@@ -532,7 +637,7 @@ export default {
         }
         }
       return flag
-      /*let flag = true
+      /!*let flag = true
       if (!this.patentMarkList) {
         return flag
       }
@@ -543,8 +648,8 @@ export default {
           patentflag = false
           break
         }
-      }*/
-     /* let citedflag =true
+      }*!/
+     /!* let citedflag =true
       for (let i = 0, length = this.citedPatentMarkList.length; i < length; i++) {
         let item = this.citedPatentMarkList[i]
         if (!item.an) {
@@ -556,14 +661,14 @@ export default {
         return false
       } else {
         return true
-      }*/
-    }
+      }*!/
+    }*/
   },
   methods: {
-    _setPatentType () {
+   /* _setPatentType () {
       this.patentType = this.patentMarkList[0] ? this.patentMarkList[0].inv_type : 2
-    },
-    addTitleWord () {
+    },*/
+   /* addTitleWord () {
       var type = 1
       var word = this.inputTitleWord.split(',')
       word.forEach((item,index)=>{
@@ -593,8 +698,8 @@ export default {
        this.searchPatentLocation({an}).then(() => {
          this.locationLoading = false
        })
-    },
-    removeErrorKeyWord (item) {
+    },*/
+    removeErrorKeyWord (item) { //将调用接口拆词 人工判断错误后保存入数据库表
       var key =item.word
       this.patentLoading = true
       this.removeErrorKeyWords({key}).then(() => {
@@ -602,14 +707,14 @@ export default {
         //alert("删除成功")
       })
     },
-    searchsortByKeywordFreqs () {
+    searchsortByKeywordFreqs () {   // 传入一段文本  拆词
       this.patentLoading = false
       var text = this.sortByKeywordFreqsText
       this.sortByKeywordFreqs({text}).then(() => {
         this.patentLoading = false
       })
     },
-    onSubmit () {
+    /*onSubmit () {
       var invtype = this.patentType
       this.btnLoading = true
       var an = this.compResult[this.index].an
@@ -648,8 +753,45 @@ export default {
           })
         }
       })
+    },*/
+    onSubmit () {    // 保存特征检索式
+      this.btnLoading = true
+      var an = this.compResult[this.index].an
+      var citedAn = this.compResult[this.index].citedAn === '' ? '1' : this.compResult[this.index].citedAn
+      var searchwords = this.searchWords
+      var categoryType = this.compResult[this.index].citeType
+      console.log(categoryType)
+      console.log(an)
+      console.log(citedAn)
+      console.log(searchwords)
+      this.addSearchWords({an,citedAn,searchwords,categoryType}).then(data => {
+        if (data.flag) {
+          this.$alert('添加成功', '提示', {
+            confirmButtonText: '确定',
+            type: 'success'
+          }).then(action => {
+            this.loading = true
+            this.showSearchWorkMark({
+              an: an,
+              citedAn: citedAn
+            }).then(() => {
+              console.log(this.SearchWordMark)
+              this.searchWords = this.SearchWordMark.searchwords
+              this.loading = false
+              this.btnLoading = false
+            })
+          })
+        } else {
+          this.$alert('添加失败', '提示', {
+            confirmButtonText: '确定',
+            type: 'error'
+          }).then(action => {
+            this.btnLoading = false
+          })
+        }
+      })
     },
-    _formatCLMS (origin) {
+    _formatCLMS (origin) {   //格式化权利要求
       let html = origin || ''
       let number = html.match(/[0-9]+[.]/g)
       if (number) {
@@ -679,21 +821,25 @@ export default {
         var an = this.compResult[0].an
         var citedAn = this.compResult[0].citedAn === '' ? '1' : this.compResult[0].citedAn
         this.searchPatentDetailUnion({an,citedAn}).then(() => {
-          this._setPatentType();
+         // this._setPatentType();
+          this.searchWords = this.SearchWordMark == null ? '':this.SearchWordMark.searchwords
           this.patentLoading = false
         })
       })
     },
     openDetails (row) {
+      this.searchWords = ''
       this.index = row.index
       this.activeNames=['1']
     /*  this.showPatentLocationList=[]
       console.log(this.showPatentLocationList)*/
       var an = row.an
       var citedAn = row.citedAn === '' ? '1' : row.citedAn
+      console.log(citedAn)
       this.patentLoading = true
       this.searchPatentDetailUnion({an,citedAn}).then(() => {
-        this._setPatentType()
+        //this._setPatentType()
+        this.searchWords = this.SearchWordMark == null ? '':this.SearchWordMark.searchwords
         this.patentLoading = false
       })
     },
@@ -709,7 +855,8 @@ export default {
         var an = this.compResult[this.index].an
         var citedAn = this.compResult[this.index].citedAn === '' ? '1' : this.compResult[this.index].citedAn
         this.searchPatentDetailUnion({an,citedAn}).then(() => {
-          this._setPatentType()
+          //this._setPatentType()
+          this.searchWords = this.SearchWordMark == null ? '':this.SearchWordMark.searchwords
           this.patentLoading = false
         })
       }
@@ -726,7 +873,8 @@ export default {
         var an = this.compResult[this.index].an
         var citedAn = this.compResult[this.index].citedAn === '' ? '1' : this.compResult[this.index].citedAn
         this.searchPatentDetailUnion({an,citedAn}).then(() => {
-          this._setPatentType()
+          //this._setPatentType()
+          this.searchWords = this.SearchWordMark == null ? '':this.SearchWordMark.searchwords
           this.patentLoading = false
         })
       }
@@ -739,7 +887,7 @@ export default {
         }
       }
     },
-    addPatentMark (type) {
+  /*  addPatentMark (type) {
       let marks = this.patentMarkList
       this.patentChaiCiTi.forEach(mark => {
         let  m = Object.create(null)
@@ -792,7 +940,7 @@ export default {
         m['word'] = mark['word']
         marks.push(m)
       })
-    },
+    },*/
     _getSelectText () {
       let text = ''
       if (window.getSelection) {
@@ -803,6 +951,13 @@ export default {
       return text
     },
     markPatentWord (type, event) {
+      let word = this._getSelectText()
+      this.searchWords = this. searchWords +' '+ word
+    },
+    addSymbol (symbol){
+      this.searchWords = this. searchWords + ' '+ symbol
+    },
+   /* markPatentWord (type, event) {
       let word = this._getSelectText()
       let flag = false
       for (let i = 0, len = this.patentMarkList.length; i < len; i++) {
@@ -853,7 +1008,7 @@ export default {
     },
     closeCitedPatentMark (mark) {
       this.citedPatentMarkList.splice(this.citedPatentMarkList.indexOf(mark), 1)
-    },
+    },*/
     ...mapActions('patentModule', [
       'searchPatentsList',
       'searchPatentListFormTwo',
@@ -863,7 +1018,9 @@ export default {
       'addPatentMarks',
       'sortByKeywordFreqs',
       'removeErrorKeyWords',
-      'searchPatentLocation'
+      'searchPatentLocation',
+      'addSearchWords',
+      'showSearchWorkMark'
     ])
   },
   components: {
@@ -888,6 +1045,7 @@ export default {
         var an = this.compResult[0].an
         var citedAn = this.compResult[0].citedAn === '' ? '1' : this.compResult[0].citedAn
         this.searchPatentDetailUnion({an,citedAn}).then(() => {
+          this.searchWords = this.SearchWordMark == null ? '':this.SearchWordMark.searchwords
           this.pageLoading = false
           this.patentLoading = false
         })
@@ -906,13 +1064,14 @@ export default {
     max-width: 1340px !important;
   }
   .patent-detail {
+    margin-top:10px;
     padding: 10px;
     background-color: rgba(233, 233, 233, .5);
     border-radius: 7px;
   }
   .an-list {
-    padding: 15px;
-    background-color: rgba(233, 233, 233, .5);
+    padding-left: 15px;
+   /* background-color: rgba(233, 233, 233, .5);*/
     border-radius: 7px;
   }
   .table-item {
@@ -951,11 +1110,12 @@ export default {
     box-shadow: inset 0 0 10px #CCC;
   }
   .card .head{
-     background-color:#9999D1;
+     background-color:#ecf5ff;
+     color: #409EFF;
+     /*font-weight: 500;*/
      text-align: center;
      padding:15px 20px;
-     color:black;
-     opacity: 0.7;
+     border-color: #b3d8ff;
   }
   .card .card-main{
     padding:15px 20px;
@@ -1017,5 +1177,8 @@ export default {
     padding: 15px;
     background-color: rgba(233, 233, 233, .5);
     border-radius: 7px;
+    margin-bottom:10px;
+    margin-top:5px;
   }
+
 </style>

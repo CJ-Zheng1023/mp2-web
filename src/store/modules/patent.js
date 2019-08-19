@@ -17,7 +17,8 @@ export default {
       patentMarkList: '',
       citedPatentMarkList: '',
       sortByKeywordFreqsList: '',
-      showPatentLocationList: []
+      showPatentLocationList: [],
+      SearchWordMark: ''
     }
   },
   mutations: {
@@ -47,6 +48,9 @@ export default {
     },
     showPatentLocation (state, data) {
       state.showPatentLocationList = data.data
+    },
+    showSearchWordMarkMutation (state, data) {
+      state.SearchWordMark = data.SearchWordMark
     }
   },
   actions: {
@@ -94,10 +98,12 @@ export default {
       return new Promise((resolve, reject) => {
         axios.all([
           axios.get(MODULE_CONTEXT + `/search/list/${an}/${citedAn}?token=${window.localStorage.getItem('token')}`),
-          axios.get(MODULE_CONTEXT + `/keyword/search/${an}/${citedAn}?token=${window.localStorage.getItem('token')}`)
-        ]).then(axios.spread((patentDetailResponse, markListResponse) => {
+          // axios.get(MODULE_CONTEXT + `/keyword/search/${an}/${citedAn}?token=${window.localStorage.getItem('token')}`)
+          axios.get(MODULE_CONTEXT + `/searchwords/search/${an}/${citedAn}?token=${window.localStorage.getItem('token')}`)
+        ]).then(axios.spread((patentDetailResponse, searchWordresponse) => {
           commit('searchCompDetail', patentDetailResponse.data)
-          commit('showPatentMarkList', markListResponse.data)
+          //  commit('showPatentMarkList', markListResponse.data)
+          commit('showSearchWordMarkMutation', searchWordresponse.data)
           resolve()
         })).catch(e => {
           console.log(e)
@@ -167,6 +173,37 @@ export default {
       return new Promise((resolve, reject) => {
         axios.get(`http://10.51.52.84:9090/sim/an?an=${an}`).then(response => {
           commit('showPatentLocation', response.data)
+          resolve()
+        }).catch(e => {
+          console.log(e)
+        })
+      })
+    },
+    addSearchWords ({commit, dispatch}, {an, citedAn, searchwords, categoryType}) {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: MODULE_CONTEXT + '/searchwords/save',
+          method: 'post',
+          data: {
+            an: an,
+            citedAn: citedAn,
+            searchWords: searchwords,
+            categoryType: categoryType
+          },
+          params: {
+            token: window.localStorage.getItem('token')
+          }
+        }).then(response => {
+          resolve(response.data)
+        }).catch(e => {
+          console.log(e)
+        })
+      })
+    },
+    showSearchWorkMark ({commit}, {an, citedAn}) {
+      return new Promise((resolve, reject) => {
+        axios.get(MODULE_CONTEXT + `/searchwords/search/${an}/${citedAn}?token=${window.localStorage.getItem('token')}`).then(response => {
+          commit('showSearchWordMarkMutation', response.data)
           resolve()
         }).catch(e => {
           console.log(e)

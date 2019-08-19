@@ -119,6 +119,15 @@ let router = new Router({
         title: '案卷测试标引',
         requireAuth: true
       }
+    },
+    {
+      path: '/FullText',
+      name: 'FullText',
+      component: () => import('../components/FullText/ResultTemp'),
+      meta: {
+        title: '全文文本',
+        requireAuth: true
+      }
     }
 
   ]
