@@ -179,7 +179,7 @@ export default {
         })
       })
     },
-    addSearchWords ({commit, dispatch}, {an, citedAn, searchwords, categoryType}) {
+    addSearchWords ({commit, dispatch}, {an, citedAn, searchwords, categoryType, searchwords2}) {
       return new Promise((resolve, reject) => {
         axios({
           url: MODULE_CONTEXT + '/searchwords/save',
@@ -188,7 +188,8 @@ export default {
             an: an,
             citedAn: citedAn,
             searchWords: searchwords,
-            categoryType: categoryType
+            categoryType: categoryType,
+            searchWords2: searchwords2
           },
           params: {
             token: window.localStorage.getItem('token')

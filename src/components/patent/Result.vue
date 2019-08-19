@@ -517,6 +517,7 @@ export default {
       inputPatentAn: '',
       inputOthersWord: '',
       searchWords:'',
+      searchWords2:'',
       locationLoading: '',
       inputTitleWord: '',
       patentType: 2,
@@ -759,12 +760,13 @@ export default {
       var an = this.compResult[this.index].an
       var citedAn = this.compResult[this.index].citedAn === '' ? '1' : this.compResult[this.index].citedAn
       var searchwords = this.searchWords
+      var searchwords2 = this.searchWords2
       var categoryType = this.compResult[this.index].citeType
       console.log(categoryType)
       console.log(an)
       console.log(citedAn)
       console.log(searchwords)
-      this.addSearchWords({an,citedAn,searchwords,categoryType}).then(data => {
+      this.addSearchWords({an,citedAn,searchwords,categoryType,searchwords2}).then(data => {
         if (data.flag) {
           this.$alert('添加成功', '提示', {
             confirmButtonText: '确定',
@@ -777,6 +779,7 @@ export default {
             }).then(() => {
               console.log(this.SearchWordMark)
               this.searchWords = this.SearchWordMark.searchwords
+              this.searchWords2 = this.SearchWordMark.searchwords2
               this.loading = false
               this.btnLoading = false
             })
@@ -823,6 +826,7 @@ export default {
         this.searchPatentDetailUnion({an,citedAn}).then(() => {
          // this._setPatentType();
           this.searchWords = this.SearchWordMark == null ? '':this.SearchWordMark.searchwords
+          this.searchWords2 = this.SearchWordMark == null ? '':this.SearchWordMark.searchwords2
           this.patentLoading = false
         })
       })
@@ -840,6 +844,7 @@ export default {
       this.searchPatentDetailUnion({an,citedAn}).then(() => {
         //this._setPatentType()
         this.searchWords = this.SearchWordMark == null ? '':this.SearchWordMark.searchwords
+        this.searchWords2 = this.SearchWordMark == null ? '':this.SearchWordMark.searchwords2
         this.patentLoading = false
       })
     },
@@ -857,6 +862,7 @@ export default {
         this.searchPatentDetailUnion({an,citedAn}).then(() => {
           //this._setPatentType()
           this.searchWords = this.SearchWordMark == null ? '':this.SearchWordMark.searchwords
+          this.searchWords2 = this.SearchWordMark == null ? '':this.SearchWordMark.searchwords2
           this.patentLoading = false
         })
       }
@@ -875,6 +881,7 @@ export default {
         this.searchPatentDetailUnion({an,citedAn}).then(() => {
           //this._setPatentType()
           this.searchWords = this.SearchWordMark == null ? '':this.SearchWordMark.searchwords
+          this.searchWords2 = this.SearchWordMark == null ? '':this.SearchWordMark.searchwords2
           this.patentLoading = false
         })
       }
@@ -1046,6 +1053,7 @@ export default {
         var citedAn = this.compResult[0].citedAn === '' ? '1' : this.compResult[0].citedAn
         this.searchPatentDetailUnion({an,citedAn}).then(() => {
           this.searchWords = this.SearchWordMark == null ? '':this.SearchWordMark.searchwords
+          this.searchWords2 = this.SearchWordMark == null ? '':this.SearchWordMark.searchwords2
           this.pageLoading = false
           this.patentLoading = false
         })
